@@ -72,8 +72,7 @@ export const orgStructureData = [
   { role: "Manager, AI Data Platform", name: "[Name to be added]", responsibility: "Oversees AI/ML platforms, data pipelines, governance, scalability, and secure integration of IT, OT, IoT, and external data sources.", focus: "AI Platforms, Data Governance, Scalable Infrastructure" },
   { role: "Manager, AI Application", name: "[Name to be added]", responsibility: "Leads AI application and digital twin development from concept to deployment, translating architecture into plant-ready solutions with engineering teams.", focus: "AI Applications, Digital Twin, Value Delivery" },
   { role: "AI Data Engineer", name: "[Name to be added]", responsibility: "Builds and optimizes ETL/ELT, streaming, and batch pipelines that deliver clean, standardized, AI-ready datasets for analytics and digital twins.", focus: "Data Pipelines, Data Quality, IT/OT/IoT Integration" },
-  { role: "AI DevOps Engineer", name: "[Name to be added]", responsibility: "Implements CI/CD, automation, monitoring, recovery, and secure deployment environments for AI systems across enterprise and plant operations.", focus: "CI/CD, Observability, Deployment Reliability" },
-  { role: "AI Support Technician", name: "[Name to be added]", responsibility: "Provides technical support for AI platforms, applications, tools, and users, helping ensure smooth daily operation and issue resolution.", focus: "User Support, Platform Operations, Service Continuity" }
+  { role: "AI DevOps Engineer", name: "[Name to be added]", responsibility: "Implements CI/CD, automation, monitoring, recovery, and secure deployment environments for AI systems across enterprise and plant operations.", focus: "CI/CD, Observability, Deployment Reliability" }
 ];
 
 export const projectHistoryData = {
