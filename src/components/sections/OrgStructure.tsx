@@ -43,23 +43,23 @@ export function OrgStructure() {
             <OrgCard member={lead} featured />
           </div>
 
-          <div className="hidden md:block relative h-16 max-w-3xl mx-auto">
-            <div className="absolute left-1/2 top-0 h-16 w-0.5 -translate-x-1/2 bg-electric-cyan/55 shadow-[0_0_10px_rgba(0,229,255,0.35)]" />
-            <div className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-electric-cyan/55 shadow-[0_0_10px_rgba(0,229,255,0.35)]" />
+          <div className="hidden md:block relative h-10 max-w-4xl mx-auto">
+            <div className="absolute left-1/2 top-0 h-10 w-0.5 -translate-x-1/2 bg-electric-cyan/70 shadow-[0_0_10px_rgba(0,229,255,0.35)]" />
+            <div className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-electric-cyan/70 shadow-[0_0_10px_rgba(0,229,255,0.35)]" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 max-w-4xl mx-auto">
             <div className="relative flex flex-col items-center">
-              <div className="hidden md:block absolute -top-16 left-1/2 h-16 w-0.5 -translate-x-1/2 bg-electric-cyan/55 shadow-[0_0_10px_rgba(0,229,255,0.35)]" />
+              <div className="hidden md:block absolute -top-10 left-1/2 h-10 w-0.5 -translate-x-1/2 bg-electric-cyan/70 shadow-[0_0_10px_rgba(0,229,255,0.35)]" />
               <OrgCard member={platformManager} delay={0.1} />
-              <div className="hidden md:block h-10 w-0.5 bg-electric-cyan/55 shadow-[0_0_10px_rgba(0,229,255,0.35)]" />
+              <div className="hidden md:block h-10 w-0.5 bg-electric-cyan/70 shadow-[0_0_10px_rgba(0,229,255,0.35)]" />
               <OrgCard member={dataEngineer} delay={0.2} />
             </div>
 
             <div className="relative flex flex-col items-center">
-              <div className="hidden md:block absolute -top-16 left-1/2 h-16 w-0.5 -translate-x-1/2 bg-electric-cyan/55 shadow-[0_0_10px_rgba(0,229,255,0.35)]" />
+              <div className="hidden md:block absolute -top-10 left-1/2 h-10 w-0.5 -translate-x-1/2 bg-electric-cyan/70 shadow-[0_0_10px_rgba(0,229,255,0.35)]" />
               <OrgCard member={applicationManager} delay={0.15} />
-              <div className="hidden md:block h-10 w-0.5 bg-electric-cyan/55 shadow-[0_0_10px_rgba(0,229,255,0.35)]" />
+              <div className="hidden md:block h-10 w-0.5 bg-electric-cyan/70 shadow-[0_0_10px_rgba(0,229,255,0.35)]" />
               <OrgCard member={devOpsEngineer} delay={0.25} />
             </div>
           </div>
