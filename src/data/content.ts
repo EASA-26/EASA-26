@@ -68,6 +68,7 @@ export const whatWeDoData = {
 };
 
 export const orgStructureData = [
+  { role: "Chief Engineer (Digital & Data)", name: "Mohd Rizal bin Mohd Ramly", responsibility: "Provides engineering leadership for digital, data, and AI initiatives, aligning delivery with business priorities, governance, and enterprise standards.", focus: "Digital & Data Leadership, Governance, Enterprise Delivery", photo: "chief-engineer.png" },
   { role: "Senior Manager (Enterprise AI Solution Architect)", name: "Ir. Ts. Muhammad Sufi Bin Ahmad Nasir, ACPE", responsibility: "Leads AI and digital twin implementation, ensuring solutions are designed, integrated, deployed, governed, and adopted effectively across platforms and operations.", focus: "Enterprise Architecture, AI Governance, IT/OT Integration", photo: "senior-manager.png" },
   { role: "Manager, AI Data Platform", name: "[Name to be added]", responsibility: "Oversees AI/ML platforms, data pipelines, governance, scalability, and secure integration of IT, OT, IoT, and external data sources.", focus: "AI Platforms, Data Governance, Scalable Infrastructure" },
   { role: "Manager, AI Application", name: "[Name to be added]", responsibility: "Leads AI application and digital twin development from concept to deployment, translating architecture into plant-ready solutions with engineering teams.", focus: "AI Applications, Digital Twin, Value Delivery" },
