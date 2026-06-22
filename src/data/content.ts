@@ -19,10 +19,10 @@ export const navigationData = [
 ];
 
 export const introData = {
-  title: "Enterprise AI Solution Architect",
+  title: "Building AI Power Capabilities",
   acronym: "EASA",
-  subtitle: "Building AI solutions for smarter, safer, and more reliable power plant operations.",
-  description: "EASA is a unit focused on transforming power plant operational challenges into scalable AI-enabled solutions.",
+  subtitle: "Scalable AI, digital twin, and data platform solutions for intelligent power generation.",
+  description: "Enterprise AI Solution Architect delivers secure AI applications, robust data pipelines, and reliable deployment practices that turn power plant operational challenges into measurable business value.",
   metrics: [
     { id: 1, label: "AI Use Cases Pipeline", value: "24+" },
     { id: 2, label: "Power Plant Domains Supported", value: "8" },
@@ -32,49 +32,48 @@ export const introData = {
 
 export const backgroundData = {
   context: [
-    "EASA bridges power plant operations, data, AI engineering, solution architecture, and business value delivery.",
-    "Power plants generate large volumes of operational and engineering data.",
-    "AI can help improve decision-making, reliability, efficiency, troubleshooting, and knowledge reuse.",
-    "EASA helps structure AI delivery from idea discovery to solution adoption."
+    "Power generation assets produce high-volume IT, OT, IoT, engineering, and maintenance data that must be trusted before it can drive AI decisions.",
+    "EASA connects plant operations, engineering teams, cybersecurity, digital infrastructure, and advanced analytics into one delivery model for enterprise AI.",
+    "The section translates AI and digital twin concepts into real plant applications for predictive maintenance, asset optimization, performance improvement, and operational excellence.",
+    "Every solution is designed with governance, security, documentation, training, and sustainable operating procedures so adoption can scale across coal, gas, hydro, and renewable assets."
   ],
   whyEasaExists: [
-    "Convert operational pain points into AI use cases",
-    "Align AI solutions with plant workflows",
-    "Enable better data-driven decisions",
-    "Support scalable and responsible AI adoption",
-    "Strengthen collaboration between plant teams, digital teams, and business stakeholders"
+    "Convert operational pain points into AI and digital twin use cases with clear value and feasibility",
+    "Establish reference architectures, platform standards, and delivery practices for secure enterprise AI",
+    "Provide AI-ready data pipelines that improve data availability, quality, reliability, and traceability",
+    "Deploy applications through CI/CD, monitoring, and support practices that reduce downtime and accelerate release cycles",
+    "Strengthen stakeholder adoption through documentation, training, governance, and measurable performance reporting"
   ]
 };
 
 export const whatWeDoData = {
   capabilities: [
-    { icon: BrainCircuit, title: "AI Solution Architecture", description: "Designing end-to-end AI architectures tailored to power plant ecosystems.", status: "Core Capability" },
-    { icon: Search, title: "AI Use Case Discovery", description: "Identifying and validating high-value AI opportunities from operational challenges.", status: "Core Capability" },
-    { icon: LineChart, title: "Power Plant Analytics", description: "Advanced analytics to uncover insights from equipment and operational data.", status: "Core Capability" },
-    { icon: Database, title: "Data-to-Decision Design", description: "Structuring data pipelines to support actionable insights and workflows.", status: "Core Capability" },
-    { icon: PenTool, title: "Prototype & MVP Development", description: "Rapid development of AI proofs-of-concept and minimum viable products.", status: "Core Capability" },
-    { icon: ShieldCheck, title: "AI Governance", description: "Ensuring responsible, ethical, and secure AI adoption across the enterprise.", status: "Core Capability" },
-    { icon: Activity, title: "Workflow Integration", description: "Seamlessly embedding AI solutions into daily operational routines.", status: "Core Capability" },
-    { icon: Users, title: "Stakeholder Enablement", description: "Driving change management and adoption among plant teams and leadership.", status: "Core Capability" }
+    { icon: BrainCircuit, title: "Enterprise AI Architecture", description: "Define reference architectures, AI frameworks, and solution designs that integrate securely with power plant IT/OT environments.", status: "Core Capability" },
+    { icon: Activity, title: "AI Applications & Digital Twins", description: "Design, develop, validate, and deploy AI applications and digital twin models for maintenance, optimization, and plant performance.", status: "Core Capability" },
+    { icon: Database, title: "AI Data Platform", description: "Build scalable platforms, governed data services, and AI-ready environments for enterprise analytics and real-time decision-making.", status: "Core Capability" },
+    { icon: LineChart, title: "Data Engineering Pipelines", description: "Ingest, clean, transform, and monitor IT, OT, IoT, SCADA, and external datasets for reliable machine learning and digital twin use.", status: "Core Capability" },
+    { icon: PenTool, title: "DevOps & MLOps Delivery", description: "Automate testing, CI/CD, deployment, observability, and recovery so AI systems can run reliably in production.", status: "Core Capability" },
+    { icon: ShieldCheck, title: "Governance & Cybersecurity", description: "Apply data governance, ISO-aligned controls, security practices, and ethical AI standards across the delivery lifecycle.", status: "Core Capability" },
+    { icon: Search, title: "Use Case Prioritization", description: "Assess operational needs, technical feasibility, business impact, and ROI to focus teams on high-value AI initiatives.", status: "Core Capability" },
+    { icon: Users, title: "Adoption & Support", description: "Prepare documentation, training, support models, and stakeholder engagement so solutions are sustained after deployment.", status: "Core Capability" }
   ],
   deliveryFlow: [
-    { step: 1, label: "Discover", desc: "Identify & assess" },
-    { step: 2, label: "Design", desc: "Architect & plan" },
-    { step: 3, label: "Prototype", desc: "Build MVP" },
-    { step: 4, label: "Validate", desc: "Test & refine" },
-    { step: 5, label: "Deploy", desc: "Implement solution" },
-    { step: 6, label: "Scale", desc: "Expand across fleet" }
+    { step: 1, label: "Discover", desc: "Prioritize value" },
+    { step: 2, label: "Architect", desc: "Design securely" },
+    { step: 3, label: "Engineer", desc: "Prepare data" },
+    { step: 4, label: "Build", desc: "Create app/twin" },
+    { step: 5, label: "Deploy", desc: "Automate release" },
+    { step: 6, label: "Operate", desc: "Monitor & scale" }
   ]
 };
 
 export const orgStructureData = [
-  { role: "Head of EASA", name: "[Name to be added]", responsibility: "Strategic direction and leadership of the EASA unit.", focus: "Strategy, Leadership, AI Governance" },
-  { role: "AI Solution Architect", name: "[Name to be added]", responsibility: "Design and orchestrate end-to-end AI architectures.", focus: "System Architecture, Cloud, Scalability" },
-  { role: "Data Scientist / AI Engineer", name: "[Name to be added]", responsibility: "Develop machine learning models and AI algorithms.", focus: "Machine Learning, Deep Learning, MLOps" },
-  { role: "Data Engineer", name: "[Name to be added]", responsibility: "Build and maintain data pipelines and infrastructure.", focus: "Data Integration, Big Data, ETL" },
-  { role: "Power Plant SME", name: "[Name to be added]", responsibility: "Provide domain expertise and validate AI outputs.", focus: "Operations, Engineering, Reliability" },
-  { role: "Product Owner / BA", name: "[Name to be added]", responsibility: "Manage product backlog and align with business value.", focus: "Requirements, Agile, Stakeholder Management" },
-  { role: "DevOps / MLOps Engineer", name: "[Name to be added]", responsibility: "Ensure smooth deployment, monitoring, and scaling of models.", focus: "CI/CD, Infrastructure as Code, Monitoring" }
+  { role: "Enterprise AI Solution Architect", name: "Senior Manager", responsibility: "Leads AI and digital twin implementation, ensuring solutions are designed, integrated, deployed, governed, and adopted effectively across platforms and operations.", focus: "Enterprise Architecture, AI Governance, IT/OT Integration" },
+  { role: "Manager, AI Data Platform", name: "[Name to be added]", responsibility: "Oversees AI/ML platforms, data pipelines, governance, scalability, and secure integration of IT, OT, IoT, and external data sources.", focus: "AI Platforms, Data Governance, Scalable Infrastructure" },
+  { role: "Manager, AI Application", name: "[Name to be added]", responsibility: "Leads AI application and digital twin development from concept to deployment, translating architecture into plant-ready solutions with engineering teams.", focus: "AI Applications, Digital Twin, Value Delivery" },
+  { role: "AI Data Engineer", name: "[Name to be added]", responsibility: "Builds and optimizes ETL/ELT, streaming, and batch pipelines that deliver clean, standardized, AI-ready datasets for analytics and digital twins.", focus: "Data Pipelines, Data Quality, IT/OT/IoT Integration" },
+  { role: "AI DevOps Engineer", name: "[Name to be added]", responsibility: "Implements CI/CD, automation, monitoring, recovery, and secure deployment environments for AI systems across enterprise and plant operations.", focus: "CI/CD, Observability, Deployment Reliability" },
+  { role: "AI Support Technician", name: "[Name to be added]", responsibility: "Provides technical support for AI platforms, applications, tools, and users, helping ensure smooth daily operation and issue resolution.", focus: "User Support, Platform Operations, Service Continuity" }
 ];
 
 export const projectHistoryData = {
