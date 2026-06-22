@@ -58,11 +58,11 @@ export function Layout({ children }: LayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-white text-slate-700 font-sans selection:bg-electric-cyan selection:text-navy-900">
+    <div className="min-h-screen bg-navy-900 text-slate-300 font-sans selection:bg-electric-cyan selection:text-navy-900">
       <Sidebar activeSection={activeSection} />
       <Topbar activeSection={activeSection} />
       
-      <main className="content-surface md:ml-64 pt-16 md:pt-0 relative bg-white text-slate-700">
+      <main className="md:ml-64 pt-16 md:pt-0 relative">
         {children}
         
         {showBackToTop && (

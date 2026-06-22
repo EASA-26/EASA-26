@@ -15,7 +15,13 @@
   }
   
   body {
-    @apply bg-white text-slate-700 font-sans antialiased selection:bg-electric-cyan selection:text-navy-900;
+    @apply bg-navy-900 text-slate-300 font-sans antialiased selection:bg-electric-cyan selection:text-navy-900;
+    /* Subtle grid pattern background */
+    background-image: 
+      linear-gradient(rgba(100, 255, 218, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(100, 255, 218, 0.03) 1px, transparent 1px);
+    background-size: 30px 30px;
+    background-position: center center;
   }
 }
 
@@ -62,80 +68,5 @@
   
   .section-subtitle {
     @apply text-electric-cyan text-sm uppercase tracking-widest font-semibold mb-2 block;
-  }
-
-  .content-surface .glass-card {
-    @apply bg-white border-slate-200 shadow-sm;
-    backdrop-filter: none;
-  }
-
-  .content-surface .glass-panel {
-    @apply bg-slate-50 border-slate-200 shadow-sm;
-    background-image: none;
-    backdrop-filter: none;
-  }
-
-  .content-surface .section-title {
-    @apply text-slate-950;
-  }
-
-  .content-surface .section-subtitle,
-  .content-surface .text-electric-cyan {
-    color: #0369a1;
-  }
-
-  .content-surface .text-electric-blue {
-    color: #0f766e;
-  }
-
-  .content-surface .text-accent-green {
-    color: #15803d;
-  }
-
-  .content-surface .text-white,
-  .content-surface .text-slate-200,
-  .content-surface .text-slate-300 {
-    @apply text-slate-900;
-  }
-
-  .content-surface .text-slate-400 {
-    @apply text-slate-600;
-  }
-
-  .content-surface .text-slate-500 {
-    @apply text-slate-500;
-  }
-
-  .content-surface .text-purple-300 {
-    @apply text-purple-700;
-  }
-
-  .content-surface .text-orange-300 {
-    @apply text-orange-700;
-  }
-
-  .content-surface .text-transparent.bg-clip-text {
-    color: #0f172a;
-    background-image: none;
-  }
-
-  .content-surface .bg-navy-700,
-  .content-surface .bg-navy-800,
-  .content-surface .bg-white\/5 {
-    @apply bg-slate-100;
-  }
-
-  .content-surface .border-white\/10,
-  .content-surface .border-white\/20,
-  .content-surface .border-white\/5 {
-    @apply border-slate-200;
-  }
-
-  .content-surface .btn-primary {
-    @apply bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100 hover:border-teal-300 hover:shadow-none focus:ring-teal-200;
-  }
-
-  .content-surface .btn-secondary {
-    @apply bg-white text-slate-700 border-slate-300 hover:bg-slate-100 hover:text-slate-950 focus:ring-slate-300;
   }
 }
