@@ -44,6 +44,7 @@ export function OrgStructure() {
           </div>
 
           <div className="hidden md:block relative h-16 max-w-3xl mx-auto">
+            <div className="absolute left-1/2 top-0 h-16 w-0.5 -translate-x-1/2 bg-electric-cyan/55 shadow-[0_0_10px_rgba(0,229,255,0.35)]" />
             <div className="absolute bottom-0 left-1/4 right-1/4 h-0.5 bg-electric-cyan/55 shadow-[0_0_10px_rgba(0,229,255,0.35)]" />
           </div>
 
