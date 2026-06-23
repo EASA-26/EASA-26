@@ -30,6 +30,20 @@ export function Introduction() {
           <p className="text-lg text-slate-400 max-w-2xl leading-relaxed mb-10">
             {introData.description}
           </p>
+
+          <div className="glass-panel max-w-4xl p-6 mb-10 border-electric-cyan/20">
+            <h2 className="text-xl font-bold text-white mb-3">{introData.aiDefinition.title}</h2>
+            <p className="text-slate-300 leading-relaxed mb-5">
+              {introData.aiDefinition.description}
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {introData.aiDefinition.points.map((point) => (
+                <div key={point} className="rounded-lg border border-white/10 bg-white/[0.03] p-4 text-sm leading-relaxed text-slate-300">
+                  {point}
+                </div>
+              ))}
+            </div>
+          </div>
           
           <div className="flex flex-wrap gap-4">
             <button 

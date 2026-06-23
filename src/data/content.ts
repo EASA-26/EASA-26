@@ -19,10 +19,19 @@ export const navigationData = [
 ];
 
 export const introData = {
-  title: "Building AI Power Capabilities",
+  title: "Enterprise AI Solution Architect",
   acronym: "EASA",
-  subtitle: "Scalable AI, digital twin, and data platform solutions for intelligent power generation.",
-  description: "Enterprise AI Solution Architect delivers secure AI applications, robust data pipelines, and reliable deployment practices that turn power plant operational challenges into measurable business value.",
+  subtitle: "Building AI power capabilities for intelligent power generation.",
+  description: "Enterprise AI Solution Architect designs secure AI applications, digital twins, data platforms, and delivery practices that turn power plant operational challenges into measurable business value.",
+  aiDefinition: {
+    title: "What is AI?",
+    description: "Artificial Intelligence (AI) is a technology that enables computer systems to learn from data, recognize patterns, make predictions, recommend actions, and assist people in making better decisions. In power generation, AI can analyze plant data, equipment behavior, maintenance history, operating conditions, and engineering knowledge to detect issues earlier, improve performance, reduce manual effort, and support safer, faster decisions.",
+    points: [
+      "AI learns from historical and real-time data instead of relying only on fixed manual rules.",
+      "AI supports people by highlighting risks, trends, and recommended actions; it does not replace engineering judgment.",
+      "AI becomes valuable when it is connected to trusted data, secure platforms, clear governance, and real operational use cases."
+    ]
+  },
   metrics: [
     { id: 1, label: "AI Use Cases Pipeline", value: "24+" },
     { id: 2, label: "Power Plant Domains Supported", value: "8" },
