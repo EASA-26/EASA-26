@@ -9,6 +9,7 @@ export function ProjectHistory() {
       case 'scale-up': return 'bg-electric-blue/20 text-electric-blue border-electric-blue/30';
       case 'pilot': return 'bg-purple-500/20 text-purple-300 border-purple-500/30';
       case 'prototype': return 'bg-orange-500/20 text-orange-300 border-orange-500/30';
+      case 'planned': return 'bg-sky-500/20 text-sky-300 border-sky-500/30';
       default: return 'bg-slate-500/20 text-slate-300 border-slate-500/30';
     }
   };

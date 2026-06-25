@@ -92,59 +92,155 @@ export const orgStructureData = [
 
 export const projectHistoryData = {
   metrics: {
-    totalProjects: "12",
-    activePilots: "3",
-    deployedSolutions: "4",
-    stakeholdersEngaged: "8"
+    totalProjects: "18",
+    activePilots: "14",
+    deployedSolutions: "0",
+    stakeholdersEngaged: "7"
   },
   projects: [
-    { 
-      title: "Predictive Maintenance", 
-      problem: "Unexpected equipment failures leading to unplanned downtime.", 
-      approach: "Anomaly detection models using historical sensor data.", 
-      stakeholders: "Maintenance, Operations", 
-      value: "Reduced unplanned downtime by estimated 15%.", 
-      status: "Deployed" 
+    {
+      title: "PeopleModelling.AI",
+      problem: "HR and project teams need a faster way to understand workforce availability, position profiles, succession options, and person-to-position fit across projects.",
+      approach: "React and FastAPI people modelling application with analytics dashboards, data upload modules, succession recommendation, person-to-position matching, scoring rules, audit logs, persistent storage, and Databricks Llama-based inferencing support.",
+      stakeholders: "HR",
+      value: "Pilot testing supports active position monitoring, candidate availability, talent match scoring, and AI-assisted succession recommendations.",
+      status: "Pilot"
     },
-    { 
-      title: "Plant Performance Optimization", 
-      problem: "Suboptimal heat rate and efficiency losses.", 
-      approach: "Digital twin simulation and prescriptive analytics.", 
-      stakeholders: "Engineering, Performance Team", 
-      value: "Identified 2% efficiency improvement opportunities.", 
-      status: "Pilot" 
+    {
+      title: "PeopleOperation",
+      problem: "HR people operation workflows need better digital tracking, visibility, and reporting.",
+      approach: "BI-focused people operation digitization for structured records, operational dashboards, and management reporting.",
+      stakeholders: "HR",
+      value: "Planned to improve workforce operation visibility and reduce manual consolidation effort.",
+      status: "Planned"
     },
-    { 
-      title: "AI Knowledge Assistant", 
-      problem: "Difficulty in rapidly accessing historical manuals and shift logs.", 
-      approach: "RAG-based Large Language Model trained on internal documents.", 
-      stakeholders: "Operations, Training", 
-      value: "Reduced document search time by 80%.", 
-      status: "Prototype" 
+    {
+      title: "CCM.AI",
+      problem: "CCM data management requires faster access, consolidation, and AI-assisted interpretation of operational records.",
+      approach: "AI LLM assistant for CCM data management, document understanding, structured retrieval, and decision support.",
+      stakeholders: "CCM",
+      value: "Prototype aims to accelerate CCM information search, analysis, and reporting.",
+      status: "Prototype"
     },
-    { 
-      title: "Asset Health Monitoring", 
-      problem: "Manual and infrequent tracking of critical asset health.", 
-      approach: "Real-time dashboard with predictive health scores.", 
-      stakeholders: "Reliability Engineering", 
-      value: "Early warning alerts provided 2 days in advance.", 
-      status: "Scale-up" 
+    {
+      title: "FINANCE.AI",
+      problem: "Financial modelling and scenario simulation are time-consuming when assumptions, scenarios, and outputs are handled manually.",
+      approach: "AI LLM concept for financial modelling, scenario simulation, and assumption-based analysis.",
+      stakeholders: "Finance",
+      value: "Planned to support faster scenario comparison and financial decision preparation.",
+      status: "Planned"
     },
-    { 
-      title: "Safety & Compliance Intelligence", 
-      problem: "Manual review of safety incidents and near-misses.", 
-      approach: "NLP classification of incident reports to identify trends.", 
-      stakeholders: "HSE, Plant Management", 
-      value: "Automated categorization and trend highlighting.", 
-      status: "Discovery" 
+    {
+      title: "RCA.AI",
+      problem: "Root cause analysis knowledge is spread across reports, cases, and operational records.",
+      approach: "GENCO RCA Intelligence Hub using AI LLM retrieval and reasoning to connect RCA cases, findings, and recommendations.",
+      stakeholders: "AOM",
+      value: "Prototype supports faster RCA knowledge discovery and repeat-issue learning.",
+      status: "Prototype"
     },
-    { 
-      title: "Generation Efficiency Dashboard", 
-      problem: "Lack of centralized visibility into fleet-wide generation metrics.", 
-      approach: "Unified data model and real-time visualization layer.", 
-      stakeholders: "Senior Management", 
-      value: "Single source of truth for generation efficiency.", 
-      status: "Deployed" 
+    {
+      title: "FILTER.AI",
+      problem: "Filter efficiency and lifecycle tracking require consistent monitoring across operating history and maintenance records.",
+      approach: "Machine learning workflow for filter efficiency tracking, lifecycle analytics, and performance trend monitoring.",
+      stakeholders: "AOM",
+      value: "Prototype supports filter performance visibility and maintenance planning.",
+      status: "Prototype"
+    },
+    {
+      title: "BLEND.AI",
+      problem: "Coal blending decisions need better optimization against cost, quality, availability, and plant constraints.",
+      approach: "Optimization and analytics concept for coal blending scenario comparison and decision support.",
+      stakeholders: "AOM",
+      value: "Planned to improve blending decisions and operational planning confidence.",
+      status: "Planned"
+    },
+    {
+      title: "T&C.AI",
+      problem: "Testing and commissioning information needs faster retrieval, standardization, and AI-assisted review.",
+      approach: "AI LLM assistant for PX testing and commissioning knowledge, documentation, and checklist support.",
+      stakeholders: "Engineering",
+      value: "Prototype supports faster T&C reference search and preparation.",
+      status: "Prototype"
+    },
+    {
+      title: "Tech.AI",
+      problem: "Technical manuals for AHM are difficult to search quickly during engineering and operational support.",
+      approach: "AI LLM technical manual assistant for AHM document search, summarization, and procedure explanation.",
+      stakeholders: "AHM",
+      value: "Prototype supports faster technical manual access and engineering knowledge reuse.",
+      status: "Prototype"
+    },
+    {
+      title: "BadActor.AI",
+      problem: "Equipment bad actors need consistent identification from reliability, operational, and maintenance signals.",
+      approach: "AI LLM analytics for EEF and bad actor identification, issue classification, and prioritization.",
+      stakeholders: "Engineering",
+      value: "Prototype supports reliability focus by highlighting recurring equipment issues.",
+      status: "Prototype"
+    },
+    {
+      title: "JEDi.AI",
+      problem: "Jellyfish detection using chlorophyll indicators requires earlier insight and clearer monitoring support.",
+      approach: "AI-assisted detection concept using chlorophyll-related signals and operational monitoring data.",
+      stakeholders: "AOM",
+      value: "Prototype supports earlier environmental risk awareness for operations.",
+      status: "Prototype"
+    },
+    {
+      title: "WPS.AI",
+      problem: "WPS and PQR drafting is document-heavy and requires repeated technical preparation effort.",
+      approach: "AI LLM assistant for WPS/PQR drafting, reference extraction, and engineering document preparation.",
+      stakeholders: "Remaco RC",
+      value: "Prototype supports faster draft preparation and document consistency.",
+      status: "Prototype"
+    },
+    {
+      title: "FFU.AI",
+      problem: "Fit For Use evaluations require structured evidence gathering, technical review, and repeatable assessment flow.",
+      approach: "AI LLM support for FFU evidence review, evaluation drafting, and engineering assessment assistance.",
+      stakeholders: "Engineering",
+      value: "Prototype supports more efficient FFU evaluation preparation.",
+      status: "Prototype"
+    },
+    {
+      title: "LMS",
+      problem: "Staff assessment and learning progress need a consolidated digital management system.",
+      approach: "BI-enabled learning management system for staff assessment, progress tracking, and reporting.",
+      stakeholders: "HR",
+      value: "Prototype supports structured staff assessment and training visibility.",
+      status: "Prototype"
+    },
+    {
+      title: "TCP",
+      problem: "Talent card information needs a centralized portal for easier access, update, and review.",
+      approach: "BI talent card portal for structured talent records, search, and reporting.",
+      stakeholders: "HR",
+      value: "Prototype supports faster talent card review and data consolidation.",
+      status: "Prototype"
+    },
+    {
+      title: "SP",
+      problem: "Successor planning requires structured visibility of candidates and readiness across roles.",
+      approach: "BI successor planner for succession visibility, candidate tracking, and planning support.",
+      stakeholders: "HR",
+      value: "Prototype supports succession planning workflow and readiness review.",
+      status: "Prototype"
+    },
+    {
+      title: "Succession.AI",
+      problem: "Succession planning for R0, R1, and R2 roles needs AI-assisted candidate matching from E16 up to COO level.",
+      approach: "AI LLM succession recommendation for role matching, candidate ranking, and readiness reasoning.",
+      stakeholders: "HR",
+      value: "Prototype supports AI-assisted succession decisions and talent pipeline review.",
+      status: "Prototype"
+    },
+    {
+      title: "FM.AI",
+      problem: "Facilities or financial management use cases require clearer scope definition before implementation.",
+      approach: "Planned AI initiative pending detailed use case discovery, data assessment, and solution framing.",
+      stakeholders: "Engineering",
+      value: "Planned for future prioritization and feasibility assessment.",
+      status: "Planned"
     }
   ]
 };
