@@ -16,38 +16,21 @@ export function Introduction() {
           transition={{ duration: 0.8 }}
           className="mb-16"
         >
-          <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
-            <div>
-              <div className="flex items-center gap-4 mb-4">
-                <span className="px-3 py-1 rounded-full bg-electric-cyan/15 text-electric-cyan text-sm font-bold tracking-widest border border-electric-cyan/40 shadow-[0_0_18px_rgba(93,244,255,0.22)]">
-                  {introData.acronym}
-                </span>
-              </div>
-              <h1 className="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-electric-cyan to-accent-green mb-6 tracking-tight leading-tight">
-                {introData.title}
-              </h1>
-              <p className="text-xl md:text-2xl text-electric-cyan font-medium mb-8 max-w-3xl leading-relaxed">
-                {introData.subtitle}
-              </p>
-              <p className="text-lg text-slate-200/80 max-w-2xl leading-relaxed mb-10">
-                {introData.description}
-              </p>
+          <div>
+            <div className="flex items-center gap-4 mb-4">
+              <span className="px-3 py-1 rounded-full bg-electric-cyan/15 text-electric-cyan text-sm font-bold tracking-widest border border-electric-cyan/40 shadow-[0_0_18px_rgba(93,244,255,0.22)]">
+                {introData.acronym}
+              </span>
             </div>
-
-            <div className="tnb-logo-rail justify-start lg:justify-end">
-              {introData.logos.map((logo) => (
-                <div
-                  key={logo.id}
-                  className="tnb-logo-card"
-                >
-                  <img
-                    src={`${import.meta.env.BASE_URL}${logo.src}`}
-                    alt={`${logo.name} logo`}
-                    className="max-h-full max-w-full object-contain"
-                  />
-                </div>
-              ))}
-            </div>
+            <h1 className="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-electric-cyan to-accent-green mb-6 tracking-tight leading-tight">
+              {introData.title}
+            </h1>
+            <p className="text-xl md:text-2xl text-electric-cyan font-medium mb-8 max-w-3xl leading-relaxed">
+              {introData.subtitle}
+            </p>
+            <p className="text-lg text-slate-200/80 max-w-2xl leading-relaxed mb-10">
+              {introData.description}
+            </p>
           </div>
 
           <div className="glass-panel max-w-4xl p-6 mb-10 border-electric-cyan/20">

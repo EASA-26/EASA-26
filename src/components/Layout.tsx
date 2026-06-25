@@ -62,7 +62,7 @@ export function Layout({ children }: LayoutProps) {
       <Sidebar activeSection={activeSection} />
       <Topbar activeSection={activeSection} />
       
-      <main className="md:ml-64 pt-16 md:pt-0 relative">
+      <main className="md:ml-72 pt-16 md:pt-0 relative">
         {children}
         
         {showBackToTop && (

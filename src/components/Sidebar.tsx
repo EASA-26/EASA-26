@@ -1,6 +1,5 @@
-import { navigationData } from '../data/content';
+import { introData, navigationData } from '../data/content';
 import { cn } from '../utils/cn';
-import { BrainCircuit } from 'lucide-react';
 
 interface SidebarProps {
   activeSection: string;
@@ -15,14 +14,22 @@ export function Sidebar({ activeSection }: SidebarProps) {
   };
 
   return (
-    <div className="hidden md:flex flex-col w-64 h-screen fixed left-0 top-0 glass-panel border-y-0 border-l-0 rounded-none z-40 bg-navy-900/90">
-      <div className="p-6 flex items-center gap-3 border-b border-white/5">
-        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-electric-blue/25 to-accent-green/25 flex items-center justify-center border border-electric-cyan/35 shadow-[0_0_18px_rgba(93,244,255,0.18)]">
-          <BrainCircuit className="text-electric-blue w-6 h-6" />
-        </div>
-        <div>
-          <h1 className="font-bold text-white leading-tight">EASA</h1>
-          <p className="text-xs text-slate-400">Dashboard Deck</p>
+    <div className="hidden md:flex flex-col w-72 h-screen fixed left-0 top-0 glass-panel border-y-0 border-l-0 rounded-none z-40 bg-navy-900/90">
+      <div className="border-b border-electric-cyan/10 p-4">
+        <div className="sidebar-brand-panel">
+          {introData.logos.map((logo) => (
+            <div key={logo.id} className="sidebar-logo-card">
+              <img
+                src={`${import.meta.env.BASE_URL}${logo.src}`}
+                alt={`${logo.name} logo`}
+                className="max-h-full max-w-full object-contain"
+              />
+            </div>
+          ))}
+          <div className="border-t border-electric-cyan/15 pt-3">
+            <h1 className="font-bold text-white leading-tight tracking-wide">EASA</h1>
+            <p className="text-xs text-slate-300">Enterprise AI Solution Architect</p>
+          </div>
         </div>
       </div>
       

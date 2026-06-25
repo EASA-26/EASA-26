@@ -108,6 +108,17 @@
     @apply text-electric-cyan text-sm uppercase tracking-widest font-semibold mb-2 block;
   }
 
+  .sidebar-brand-panel {
+    @apply rounded-xl border border-electric-cyan/20 bg-navy-900/45 p-3 backdrop-blur-md shadow-[0_18px_45px_rgba(0,0,0,0.24)];
+    background-image:
+      linear-gradient(135deg, rgba(37, 216, 255, 0.12), transparent 42%),
+      linear-gradient(315deg, rgba(120, 214, 75, 0.1), transparent 46%);
+  }
+
+  .sidebar-logo-card {
+    @apply mb-2 flex h-14 w-full items-center justify-center rounded-md border border-white/50 bg-white/95 p-2 shadow-[0_0_18px_rgba(93,244,255,0.12)];
+  }
+
   .tnb-hero-bg {
     background:
       radial-gradient(circle at 76% 28%, rgba(93, 244, 255, 0.22), transparent 22rem),
