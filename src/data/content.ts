@@ -22,9 +22,9 @@ export const introData = {
   title: "Enterprise AI Solution Architect",
   acronym: "EASA",
   logos: [
-    { id: "easa", name: "EASA", src: "/easa-logo.png" },
-    { id: "ted", name: "Technology & Engineering Department", src: "/ted-logo.png" },
-    { id: "tnb-genco", name: "TNB Genco", src: "/tnb-genco-logo.png" },
+    { id: "easa", name: "EASA", src: "easa-logo.png" },
+    { id: "ted", name: "Technology & Engineering Department", src: "ted-logo.png" },
+    { id: "tnb-genco", name: "TNB Genco", src: "tnb-genco-logo.png" },
   ],
   subtitle: "Building AI power capabilities for intelligent power generation.",
   description: "Enterprise AI Solution Architect designs secure AI applications, digital twins, data platforms, and delivery practices that turn power plant operational challenges into measurable business value.",

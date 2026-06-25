@@ -16,14 +16,14 @@ export function Introduction() {
           transition={{ duration: 0.8 }}
           className="mb-16"
         >
-          <div className="mb-10 flex flex-wrap items-center gap-4 md:gap-5">
+          <div className="mb-10 flex flex-wrap items-center justify-end gap-3 md:gap-4">
             {introData.logos.map((logo) => (
               <div
                 key={logo.id}
-                className="flex h-16 w-40 items-center justify-center rounded-lg border border-white/10 bg-white p-3 shadow-lg shadow-black/10 md:h-20 md:w-48"
+                className="flex h-14 w-32 items-center justify-center rounded-lg border border-white/10 bg-white p-2 shadow-lg shadow-black/10 sm:h-16 sm:w-40 md:h-18 md:w-44"
               >
                 <img
-                  src={logo.src}
+                  src={`${import.meta.env.BASE_URL}${logo.src}`}
                   alt={`${logo.name} logo`}
                   className="max-h-full max-w-full object-contain"
                 />
