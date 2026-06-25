@@ -17,15 +17,17 @@ export function Sidebar({ activeSection }: SidebarProps) {
     <div className="hidden md:flex flex-col w-64 h-screen fixed left-0 top-0 glass-panel border-y-0 border-l-0 rounded-none z-40 bg-navy-900/90">
       <div className="border-b border-electric-cyan/10 p-3">
         <div className="sidebar-brand-panel">
-          {introData.logos.map((logo) => (
-            <div key={logo.id} className="sidebar-logo-card">
-              <img
-                src={`${import.meta.env.BASE_URL}${logo.src}`}
-                alt={`${logo.name} logo`}
-                className="max-h-full max-w-full object-contain"
-              />
-            </div>
-          ))}
+          <div className="sidebar-logo-row">
+            {introData.logos.map((logo) => (
+              <div key={logo.id} className="sidebar-logo-card">
+                <img
+                  src={`${import.meta.env.BASE_URL}${logo.src}`}
+                  alt={`${logo.name} logo`}
+                  className="max-h-full max-w-full object-contain"
+                />
+              </div>
+            ))}
+          </div>
           <div className="border-t border-electric-cyan/15 pt-2.5">
             <h1 className="font-bold text-white leading-tight tracking-wide">EASA</h1>
             <p className="text-xs leading-snug text-slate-300">Enterprise AI Solution Architect</p>

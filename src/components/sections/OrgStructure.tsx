@@ -21,6 +21,7 @@ function OrgCard({ member, featured = false, delay = 0 }: { member: OrgMember; f
             alt={member.name}
             className="ai-avatar-image"
           />
+          <span className="ai-avatar-shimmer" />
         </div>
       )}
       <h3 className={`${featured ? 'text-xl' : 'text-lg'} font-bold text-white mb-1 break-words`}>{member.role}</h3>

@@ -115,8 +115,12 @@
       linear-gradient(315deg, rgba(120, 214, 75, 0.1), transparent 46%);
   }
 
+  .sidebar-logo-row {
+    @apply mb-2.5 grid grid-cols-3 gap-1.5;
+  }
+
   .sidebar-logo-card {
-    @apply mb-1.5 flex h-10 w-full items-center justify-center rounded-md border border-white/50 bg-white/95 p-1.5 shadow-[0_0_16px_rgba(93,244,255,0.12)];
+    @apply flex h-9 min-w-0 items-center justify-center rounded-md border border-white/50 bg-white/95 p-1 shadow-[0_0_16px_rgba(93,244,255,0.12)];
   }
 
   .ai-avatar-frame {
@@ -151,6 +155,19 @@
   .ai-avatar-image {
     @apply relative z-10 h-full w-full rounded-full border-2 border-electric-cyan/60 object-cover;
     box-shadow: 0 0 24px rgba(37, 216, 255, 0.28);
+    transform-origin: 50% 58%;
+    animation: ai-portrait-motion 6.2s ease-in-out infinite;
+  }
+
+  .ai-avatar-shimmer {
+    position: absolute;
+    inset: 4px;
+    z-index: 11;
+    border-radius: 9999px;
+    background: linear-gradient(115deg, transparent 8%, rgba(93, 244, 255, 0.16) 38%, transparent 58%);
+    mix-blend-mode: screen;
+    pointer-events: none;
+    animation: ai-portrait-shimmer 4.6s ease-in-out infinite;
   }
 
   @keyframes ai-avatar-float {
@@ -166,6 +183,43 @@
   @keyframes ai-avatar-spin {
     to {
       transform: rotate(360deg);
+    }
+  }
+
+  @keyframes ai-portrait-motion {
+    0%,
+    100% {
+      filter: brightness(1) saturate(1);
+      transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+    }
+    18% {
+      filter: brightness(1.04) saturate(1.08);
+      transform: translate3d(1px, -2px, 0) rotate(-1.2deg) scale(1.025);
+    }
+    36% {
+      transform: translate3d(-1px, 1px, 0) rotate(0.8deg) scale(1.018);
+    }
+    52% {
+      filter: brightness(1.08) saturate(1.1);
+      transform: translate3d(1px, 2px, 0) rotate(1.1deg) scale(1.035);
+    }
+    72% {
+      transform: translate3d(-1px, -1px, 0) rotate(-0.6deg) scale(1.02);
+    }
+  }
+
+  @keyframes ai-portrait-shimmer {
+    0%,
+    100% {
+      opacity: 0;
+      transform: translateX(-26%) rotate(-10deg);
+    }
+    45% {
+      opacity: 0.72;
+    }
+    70% {
+      opacity: 0;
+      transform: translateX(26%) rotate(-10deg);
     }
   }
 
