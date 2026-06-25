@@ -14,8 +14,8 @@ export function Sidebar({ activeSection }: SidebarProps) {
   };
 
   return (
-    <div className="hidden md:flex flex-col w-72 h-screen fixed left-0 top-0 glass-panel border-y-0 border-l-0 rounded-none z-40 bg-navy-900/90">
-      <div className="border-b border-electric-cyan/10 p-4">
+    <div className="hidden md:flex flex-col w-64 h-screen fixed left-0 top-0 glass-panel border-y-0 border-l-0 rounded-none z-40 bg-navy-900/90">
+      <div className="border-b border-electric-cyan/10 p-3">
         <div className="sidebar-brand-panel">
           {introData.logos.map((logo) => (
             <div key={logo.id} className="sidebar-logo-card">
@@ -26,14 +26,14 @@ export function Sidebar({ activeSection }: SidebarProps) {
               />
             </div>
           ))}
-          <div className="border-t border-electric-cyan/15 pt-3">
+          <div className="border-t border-electric-cyan/15 pt-2.5">
             <h1 className="font-bold text-white leading-tight tracking-wide">EASA</h1>
-            <p className="text-xs text-slate-300">Enterprise AI Solution Architect</p>
+            <p className="text-xs leading-snug text-slate-300">Enterprise AI Solution Architect</p>
           </div>
         </div>
       </div>
       
-      <nav className="flex-1 py-8 px-4 flex flex-col gap-2">
+      <nav className="flex-1 py-6 px-4 flex flex-col gap-2">
         {navigationData.map((item) => (
           <button
             key={item.id}

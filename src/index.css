@@ -109,14 +109,64 @@
   }
 
   .sidebar-brand-panel {
-    @apply rounded-xl border border-electric-cyan/20 bg-navy-900/45 p-3 backdrop-blur-md shadow-[0_18px_45px_rgba(0,0,0,0.24)];
+    @apply rounded-xl border border-electric-cyan/20 bg-navy-900/45 p-2.5 backdrop-blur-md shadow-[0_18px_45px_rgba(0,0,0,0.24)];
     background-image:
       linear-gradient(135deg, rgba(37, 216, 255, 0.12), transparent 42%),
       linear-gradient(315deg, rgba(120, 214, 75, 0.1), transparent 46%);
   }
 
   .sidebar-logo-card {
-    @apply mb-2 flex h-14 w-full items-center justify-center rounded-md border border-white/50 bg-white/95 p-2 shadow-[0_0_18px_rgba(93,244,255,0.12)];
+    @apply mb-1.5 flex h-10 w-full items-center justify-center rounded-md border border-white/50 bg-white/95 p-1.5 shadow-[0_0_16px_rgba(93,244,255,0.12)];
+  }
+
+  .ai-avatar-frame {
+    @apply relative h-28 w-28 rounded-full p-1 md:h-32 md:w-32;
+    animation: ai-avatar-float 4.8s ease-in-out infinite;
+  }
+
+  .ai-avatar-frame::before,
+  .ai-avatar-frame::after {
+    content: '';
+    position: absolute;
+    border-radius: 9999px;
+    pointer-events: none;
+  }
+
+  .ai-avatar-frame::before {
+    inset: -6px;
+    border: 1px solid rgba(93, 244, 255, 0.58);
+    border-top-color: rgba(120, 214, 75, 0.95);
+    border-right-color: rgba(37, 216, 255, 0.18);
+    box-shadow: 0 0 22px rgba(93, 244, 255, 0.26), inset 0 0 18px rgba(120, 214, 75, 0.12);
+    animation: ai-avatar-spin 7s linear infinite;
+  }
+
+  .ai-avatar-frame::after {
+    inset: -13px;
+    border: 1px dashed rgba(93, 244, 255, 0.34);
+    box-shadow: 0 0 30px rgba(37, 216, 255, 0.16);
+    animation: ai-avatar-spin 11s linear infinite reverse;
+  }
+
+  .ai-avatar-image {
+    @apply relative z-10 h-full w-full rounded-full border-2 border-electric-cyan/60 object-cover;
+    box-shadow: 0 0 24px rgba(37, 216, 255, 0.28);
+  }
+
+  @keyframes ai-avatar-float {
+    0%,
+    100% {
+      transform: translateY(0) scale(1);
+    }
+    50% {
+      transform: translateY(-6px) scale(1.015);
+    }
+  }
+
+  @keyframes ai-avatar-spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   .tnb-hero-bg {

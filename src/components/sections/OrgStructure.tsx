@@ -15,11 +15,13 @@ function OrgCard({ member, featured = false, delay = 0 }: { member: OrgMember; f
       className={`glass-card relative z-10 w-full p-6 text-center ${featured ? 'border-electric-blue border-b-4 md:max-w-xl' : ''}`}
     >
       {photoSrc && (
-        <img
-          src={photoSrc}
-          alt={member.name}
-          className="mx-auto mb-5 h-24 w-24 rounded-full border-2 border-electric-blue/50 object-cover shadow-[0_0_20px_rgba(100,255,218,0.22)] md:h-28 md:w-28"
-        />
+        <div className="ai-avatar-frame mx-auto mb-5">
+          <img
+            src={photoSrc}
+            alt={member.name}
+            className="ai-avatar-image"
+          />
+        </div>
       )}
       <h3 className={`${featured ? 'text-xl' : 'text-lg'} font-bold text-white mb-1 break-words`}>{member.role}</h3>
       <p className="text-electric-cyan text-sm font-medium mb-3 break-words">{member.name}</p>
