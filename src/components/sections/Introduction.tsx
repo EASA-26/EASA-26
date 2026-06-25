@@ -16,6 +16,21 @@ export function Introduction() {
           transition={{ duration: 0.8 }}
           className="mb-16"
         >
+          <div className="mb-10 flex flex-wrap items-center gap-4 md:gap-5">
+            {introData.logos.map((logo) => (
+              <div
+                key={logo.id}
+                className="flex h-16 w-40 items-center justify-center rounded-lg border border-white/10 bg-white p-3 shadow-lg shadow-black/10 md:h-20 md:w-48"
+              >
+                <img
+                  src={logo.src}
+                  alt={`${logo.name} logo`}
+                  className="max-h-full max-w-full object-contain"
+                />
+              </div>
+            ))}
+          </div>
+
           <div className="flex items-center gap-4 mb-4">
             <span className="px-3 py-1 rounded-full bg-electric-cyan/20 text-electric-cyan text-sm font-bold tracking-widest border border-electric-cyan/30">
               {introData.acronym}

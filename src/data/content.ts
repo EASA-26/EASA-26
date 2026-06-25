@@ -21,15 +21,20 @@ export const navigationData = [
 export const introData = {
   title: "Enterprise AI Solution Architect",
   acronym: "EASA",
+  logos: [
+    { id: "easa", name: "EASA", src: "/easa-logo.png" },
+    { id: "ted", name: "Technology & Engineering Department", src: "/ted-logo.png" },
+    { id: "tnb-genco", name: "TNB Genco", src: "/tnb-genco-logo.png" },
+  ],
   subtitle: "Building AI power capabilities for intelligent power generation.",
   description: "Enterprise AI Solution Architect designs secure AI applications, digital twins, data platforms, and delivery practices that turn power plant operational challenges into measurable business value.",
   aiDefinition: {
-    title: "What is AI?",
-    description: "Artificial Intelligence (AI) is a technology that enables computer systems to learn from data, recognize patterns, make predictions, recommend actions, and assist people in making better decisions. In power generation, AI can analyze plant data, equipment behavior, maintenance history, operating conditions, and engineering knowledge to detect issues earlier, improve performance, reduce manual effort, and support safer, faster decisions.",
+    title: "What are AI and LLMs?",
+    description: "Artificial Intelligence (AI) enables computer systems to learn from data, recognize patterns, make predictions, recommend actions, and assist people in making better decisions. Large Language Models (LLMs) are a type of AI designed to understand, summarize, generate, and reason over human language. In power generation, AI and LLMs can analyze plant data, equipment behavior, maintenance history, operating conditions, manuals, procedures, and engineering knowledge to detect issues earlier, improve performance, reduce manual effort, and support safer, faster decisions.",
     points: [
       "AI learns from historical and real-time data instead of relying only on fixed manual rules.",
-      "AI supports people by highlighting risks, trends, and recommended actions; it does not replace engineering judgment.",
-      "AI becomes valuable when it is connected to trusted data, secure platforms, clear governance, and real operational use cases."
+      "LLMs help teams search, summarize, explain, and draft knowledge from documents, reports, procedures, and engineering records.",
+      "AI and LLMs become valuable when connected to trusted data, secure platforms, clear governance, and real operational use cases."
     ]
   },
   metrics: [
