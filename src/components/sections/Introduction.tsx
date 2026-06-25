@@ -8,43 +8,47 @@ export function Introduction() {
   };
 
   return (
-    <section id="intro" className="section-container min-h-screen pt-24 md:pt-20">
-      <div className="max-w-5xl mx-auto w-full">
+    <section id="intro" className="section-container tnb-hero-bg relative min-h-screen overflow-hidden pt-24 md:pt-20">
+      <div className="relative z-10 max-w-6xl mx-auto w-full">
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="mb-16"
         >
-          <div className="mb-10 flex flex-wrap items-center justify-end gap-3 md:gap-4">
-            {introData.logos.map((logo) => (
-              <div
-                key={logo.id}
-                className="flex h-14 w-32 items-center justify-center rounded-lg border border-white/10 bg-white p-2 shadow-lg shadow-black/10 sm:h-16 sm:w-40 md:h-18 md:w-44"
-              >
-                <img
-                  src={`${import.meta.env.BASE_URL}${logo.src}`}
-                  alt={`${logo.name} logo`}
-                  className="max-h-full max-w-full object-contain"
-                />
+          <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
+            <div>
+              <div className="flex items-center gap-4 mb-4">
+                <span className="px-3 py-1 rounded-full bg-electric-cyan/15 text-electric-cyan text-sm font-bold tracking-widest border border-electric-cyan/40 shadow-[0_0_18px_rgba(93,244,255,0.22)]">
+                  {introData.acronym}
+                </span>
               </div>
-            ))}
-          </div>
+              <h1 className="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-electric-cyan to-accent-green mb-6 tracking-tight leading-tight">
+                {introData.title}
+              </h1>
+              <p className="text-xl md:text-2xl text-electric-cyan font-medium mb-8 max-w-3xl leading-relaxed">
+                {introData.subtitle}
+              </p>
+              <p className="text-lg text-slate-200/80 max-w-2xl leading-relaxed mb-10">
+                {introData.description}
+              </p>
+            </div>
 
-          <div className="flex items-center gap-4 mb-4">
-            <span className="px-3 py-1 rounded-full bg-electric-cyan/20 text-electric-cyan text-sm font-bold tracking-widest border border-electric-cyan/30">
-              {introData.acronym}
-            </span>
+            <div className="tnb-logo-rail justify-start lg:justify-end">
+              {introData.logos.map((logo) => (
+                <div
+                  key={logo.id}
+                  className="tnb-logo-card"
+                >
+                  <img
+                    src={`${import.meta.env.BASE_URL}${logo.src}`}
+                    alt={`${logo.name} logo`}
+                    className="max-h-full max-w-full object-contain"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
-          <h1 className="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-slate-400 mb-6 tracking-tight leading-tight">
-            {introData.title}
-          </h1>
-          <p className="text-xl md:text-2xl text-electric-cyan font-medium mb-8 max-w-3xl leading-relaxed">
-            {introData.subtitle}
-          </p>
-          <p className="text-lg text-slate-400 max-w-2xl leading-relaxed mb-10">
-            {introData.description}
-          </p>
 
           <div className="glass-panel max-w-4xl p-6 mb-10 border-electric-cyan/20">
             <h2 className="text-xl font-bold text-white mb-3">{introData.aiDefinition.title}</h2>

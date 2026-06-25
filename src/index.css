@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 @theme {
-  --color-navy-900: #0a192f;
-  --color-navy-800: #112240;
-  --color-navy-700: #233554;
-  --color-electric-blue: #64ffda;
-  --color-electric-cyan: #00e5ff;
-  --color-accent-green: #00ff7f;
+  --color-navy-900: #071d3a;
+  --color-navy-800: #0c2d55;
+  --color-navy-700: #13456d;
+  --color-electric-blue: #25d8ff;
+  --color-electric-cyan: #5df4ff;
+  --color-accent-green: #78d64b;
 }
 
 @layer base {
@@ -16,22 +16,23 @@
   
   body {
     @apply bg-navy-900 text-slate-300 font-sans antialiased selection:bg-electric-cyan selection:text-navy-900;
-    /* Subtle grid pattern background */
     background-image: 
-      linear-gradient(rgba(100, 255, 218, 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(100, 255, 218, 0.03) 1px, transparent 1px);
-    background-size: 30px 30px;
+      linear-gradient(rgba(37, 216, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(120, 214, 75, 0.035) 1px, transparent 1px),
+      radial-gradient(circle at 84% 20%, rgba(120, 214, 75, 0.12), transparent 28%),
+      linear-gradient(135deg, #071d3a 0%, #092f5d 48%, #123f54 100%);
+    background-size: 30px 30px, 30px 30px, auto, auto;
     background-position: center center;
   }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-navy-800/60 backdrop-blur-md border border-electric-blue/10 rounded-2xl shadow-lg;
+    @apply bg-navy-800/65 backdrop-blur-md border border-electric-blue/15 rounded-2xl shadow-lg;
   }
   
   .glass-panel {
-    @apply bg-navy-700/40 backdrop-blur-sm border border-white/5 rounded-xl;
+    @apply bg-navy-700/35 backdrop-blur-sm border border-electric-blue/10 rounded-xl;
   }
 
   .nav-item {
@@ -39,7 +40,7 @@
   }
   
   .nav-item-active {
-    @apply bg-electric-blue/10 text-electric-blue border-l-2 border-electric-blue;
+    @apply bg-electric-blue/10 text-electric-cyan border-l-2 border-accent-green;
   }
 
   .nav-item-inactive {
@@ -47,8 +48,8 @@
   }
 
   .btn-primary {
-    @apply px-6 py-2.5 rounded-lg bg-electric-blue/10 text-electric-blue border border-electric-blue/30 
-           hover:bg-electric-blue/20 hover:border-electric-blue hover:shadow-[0_0_15px_rgba(100,255,218,0.3)] 
+    @apply px-6 py-2.5 rounded-lg bg-electric-blue/10 text-electric-cyan border border-electric-blue/35 
+           hover:bg-electric-blue/20 hover:border-electric-cyan hover:shadow-[0_0_18px_rgba(37,216,255,0.34)] 
            transition-all duration-300 font-medium focus:outline-none focus:ring-2 focus:ring-electric-blue/50;
   }
 
@@ -68,5 +69,47 @@
   
   .section-subtitle {
     @apply text-electric-cyan text-sm uppercase tracking-widest font-semibold mb-2 block;
+  }
+
+  .tnb-hero-bg {
+    background:
+      radial-gradient(circle at 76% 28%, rgba(93, 244, 255, 0.22), transparent 22rem),
+      radial-gradient(circle at 90% 16%, rgba(120, 214, 75, 0.26), transparent 20rem),
+      linear-gradient(124deg, rgba(7, 29, 58, 0.98) 0%, rgba(8, 64, 114, 0.92) 50%, rgba(58, 139, 82, 0.82) 100%);
+  }
+
+  .tnb-hero-bg::before {
+    content: '';
+    position: absolute;
+    inset: -18% -10% auto auto;
+    width: min(68vw, 820px);
+    aspect-ratio: 1;
+    border-radius: 9999px;
+    background:
+      repeating-radial-gradient(circle, rgba(93, 244, 255, 0.18) 0 2px, transparent 2px 22px),
+      radial-gradient(circle, transparent 36%, rgba(93, 244, 255, 0.14) 37%, transparent 38%, transparent 53%, rgba(120, 214, 75, 0.16) 54%, transparent 56%);
+    opacity: 0.62;
+    pointer-events: none;
+  }
+
+  .tnb-hero-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(120deg, rgba(93, 244, 255, 0.14) 1px, transparent 1px),
+      linear-gradient(60deg, rgba(120, 214, 75, 0.1) 1px, transparent 1px);
+    background-size: 150px 150px, 190px 190px;
+    mask-image: linear-gradient(90deg, transparent, black 22%, black 92%, transparent);
+    opacity: 0.42;
+    pointer-events: none;
+  }
+
+  .tnb-logo-rail {
+    @apply flex flex-wrap items-center justify-end gap-3 rounded-xl border border-electric-cyan/20 bg-navy-900/30 p-3 backdrop-blur-md shadow-[0_18px_50px_rgba(0,0,0,0.24)];
+  }
+
+  .tnb-logo-card {
+    @apply flex h-14 w-32 items-center justify-center rounded-md border border-white/40 bg-white/95 p-2 shadow-[0_0_20px_rgba(93,244,255,0.12)] sm:w-36 md:h-16 md:w-40;
   }
 }
