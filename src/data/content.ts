@@ -92,8 +92,8 @@ export const orgStructureData = [
 
 export const projectHistoryData = {
   metrics: {
-    totalProjects: "18",
-    activePilots: "14",
+    totalProjects: "16",
+    activePilots: "13",
     deployedSolutions: "0",
     stakeholdersEngaged: "7"
   },
@@ -140,27 +140,11 @@ export const projectHistoryData = {
       status: "Prototype"
     },
     {
-      title: "FILTER.AI",
-      problem: "Filter efficiency and lifecycle tracking require consistent monitoring across operating history and maintenance records.",
-      approach: "Machine learning workflow for filter efficiency tracking, lifecycle analytics, and performance trend monitoring.",
-      stakeholders: "AOM",
-      value: "Prototype supports filter performance visibility and maintenance planning.",
-      status: "Prototype"
-    },
-    {
-      title: "BLEND.AI",
-      problem: "Coal blending decisions need better optimization against cost, quality, availability, and plant constraints.",
-      approach: "Optimization and analytics concept for coal blending scenario comparison and decision support.",
-      stakeholders: "AOM",
-      value: "Planned to improve blending decisions and operational planning confidence.",
-      status: "Planned"
-    },
-    {
       title: "T&C.AI",
-      problem: "Testing and commissioning information needs faster retrieval, standardization, and AI-assisted review.",
-      approach: "AI LLM assistant for PX testing and commissioning knowledge, documentation, and checklist support.",
-      stakeholders: "Engineering",
-      value: "Prototype supports faster T&C reference search and preparation.",
+      problem: "HR needs to review and compare Terms and Conditions across multiple TNB Genco employment books, including Genco hire, TNB hire, Remaco hire, and other related T&C references.",
+      approach: "AI LLM assistant for Terms and Conditions review, semantic search, comparison, summarization, and revision support across the six TNB Genco T&C books.",
+      stakeholders: "HR",
+      value: "Prototype helps HR revise T&C content faster, compare clauses across books, and reduce manual review effort with an AI assistant.",
       status: "Prototype"
     },
     {
