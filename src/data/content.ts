@@ -117,10 +117,11 @@ export const projectHistoryData = {
     },
     {
       title: "CCM.AI",
+      image: "ccm-ai-ui.png",
       problem: "CCM data management requires faster access, consolidation, and AI-assisted interpretation of operational records.",
-      approach: "AI LLM assistant for CCM data management, document understanding, structured retrieval, and decision support.",
+      approach: "Contract intelligence hub for document evidence, clause learning, OCR processing, risk comparison, and AI-assisted contract review.",
       stakeholders: "CCM",
-      value: "Prototype aims to accelerate CCM information search, analysis, and reporting.",
+      value: "Prototype accelerates contract document discovery, clause review, audit tracking, and AI-assisted policy or risk comparison.",
       status: "Prototype"
     },
     {
@@ -140,7 +141,8 @@ export const projectHistoryData = {
       status: "Prototype"
     },
     {
-      title: "T&C.AI",
+      title: "PX T&C.AI",
+      image: "px-tc-ai-ui.png",
       problem: "HR needs to review and compare Terms and Conditions across multiple TNB Genco employment books, including Genco hire, TNB hire, Remaco hire, and other related T&C references.",
       approach: "AI LLM assistant for Terms and Conditions review, semantic search, comparison, summarization, and revision support across the six TNB Genco T&C books.",
       stakeholders: "HR",
@@ -156,11 +158,12 @@ export const projectHistoryData = {
       status: "Prototype"
     },
     {
-      title: "BadActor.AI",
+      title: "Bad Actor.AI",
+      image: "bad-actor-ai-ui.png",
       problem: "Equipment bad actors need consistent identification from reliability, operational, and maintenance signals.",
-      approach: "AI LLM analytics for EEF and bad actor identification, issue classification, and prioritization.",
+      approach: "Equipment intelligence application for bad actor analysis, equipment finder workflows, vendor references, and multi-model AI support for reliability decisions.",
       stakeholders: "Engineering",
-      value: "Prototype supports reliability focus by highlighting recurring equipment issues.",
+      value: "Prototype supports power plant reliability by turning equipment specifications and station failure data into action-ready sourcing and reliability decisions.",
       status: "Prototype"
     },
     {
