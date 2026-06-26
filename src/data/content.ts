@@ -260,10 +260,8 @@ export const engageData = {
   ],
   contact: {
     unit: "Enterprise AI Solution Architect",
-    person: "[Name to be added]",
-    email: "email.to.be.added@example.com",
-    channel: "[To be added]",
-    location: "[To be added]",
-    github: "[To be added]"
+    person: "Ir. Ts. Muhammad Sufi Bin Ahmad Nasir, ACPE",
+    email: "msufi.nasir@tnb.com.my",
+    location: "Genco HQ"
   }
 };

@@ -1,6 +1,6 @@
 import { engageData } from '../../data/content';
 import { motion } from 'framer-motion';
-import { ArrowRight, Mail, MapPin, MessagesSquare, Globe, User } from 'lucide-react';
+import { ArrowRight, Mail, MapPin, User } from 'lucide-react';
 
 export function EngageWithUs() {
   return (
@@ -92,31 +92,11 @@ export function EngageWithUs() {
 
               <div className="flex items-start gap-4">
                 <div className="p-2 bg-white/5 rounded-lg text-electric-cyan">
-                  <MessagesSquare className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="text-xs text-slate-500 uppercase tracking-wider mb-1">Internal Channel</div>
-                  <div className="text-slate-300 text-sm">{engageData.contact.channel}</div>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="p-2 bg-white/5 rounded-lg text-electric-cyan">
                   <MapPin className="w-5 h-5" />
                 </div>
                 <div>
                   <div className="text-xs text-slate-500 uppercase tracking-wider mb-1">Office Location</div>
                   <div className="text-slate-300 text-sm">{engageData.contact.location}</div>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-4">
-                <div className="p-2 bg-white/5 rounded-lg text-electric-cyan">
-                  <Globe className="w-5 h-5" />
-                </div>
-                <div>
-                  <div className="text-xs text-slate-500 uppercase tracking-wider mb-1">GitHub Repository</div>
-                  <div className="text-slate-300 text-sm">{engageData.contact.github}</div>
                 </div>
               </div>
             </div>
