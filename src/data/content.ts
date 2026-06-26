@@ -92,9 +92,9 @@ export const orgStructureData = [
 
 export const projectHistoryData = {
   metrics: {
-    totalProjects: "16",
-    activePilots: "13",
-    deployedSolutions: "0",
+    totalProjects: "17",
+    activePilots: "11",
+    deployedSolutions: "3",
     stakeholdersEngaged: "7"
   },
   projects: [
@@ -106,6 +106,14 @@ export const projectHistoryData = {
       stakeholders: "HR",
       value: "Pilot testing supports active position monitoring, candidate availability, talent match scoring, and AI-assisted succession recommendations.",
       status: "Pilot"
+    },
+    {
+      title: "Recruitment Filtration.AI",
+      problem: "HR needs to review a large volume of resumes efficiently and identify the most suitable candidates before interview shortlisting.",
+      approach: "AI-assisted recruitment filtration application that parses resumes, compares candidate profiles against role requirements, ranks suitability, and supports structured pre-interview screening.",
+      stakeholders: "HR",
+      value: "Deployed to help HR reduce manual resume screening effort, improve candidate ranking consistency, and focus interview time on the strongest applicants.",
+      status: "Deployed"
     },
     {
       title: "PeopleOperation",
@@ -163,8 +171,8 @@ export const projectHistoryData = {
       problem: "Equipment bad actors need consistent identification from reliability, operational, and maintenance signals.",
       approach: "Equipment intelligence application for bad actor analysis, equipment finder workflows, vendor references, and multi-model AI support for reliability decisions.",
       stakeholders: "Engineering",
-      value: "Prototype supports power plant reliability by turning equipment specifications and station failure data into action-ready sourcing and reliability decisions.",
-      status: "Prototype"
+      value: "Deployed to support power plant reliability by turning equipment specifications and station failure data into action-ready sourcing and reliability decisions.",
+      status: "Deployed"
     },
     {
       title: "JEDi.AI",
@@ -187,8 +195,8 @@ export const projectHistoryData = {
       problem: "Fit For Use evaluations require structured evidence gathering, technical review, and repeatable assessment flow.",
       approach: "AI LLM support for FFU evidence review, evaluation drafting, and engineering assessment assistance.",
       stakeholders: "Engineering",
-      value: "Prototype supports more efficient FFU evaluation preparation.",
-      status: "Prototype"
+      value: "Deployed to support more efficient FFU evaluation preparation, evidence review, and engineering assessment assistance.",
+      status: "Deployed"
     },
     {
       title: "LMS",
