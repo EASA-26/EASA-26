@@ -72,6 +72,16 @@ export function ProjectHistory() {
                   {project.status}
                 </span>
               </div>
+
+              {'image' in project && project.image && (
+                <div className="mb-5 overflow-hidden rounded-lg border border-electric-cyan/20 bg-white/95 shadow-[0_0_24px_rgba(37,216,255,0.14)]">
+                  <img
+                    src={`${import.meta.env.BASE_URL}${project.image}`}
+                    alt={`${project.title} user interface preview`}
+                    className="aspect-video w-full object-cover object-top"
+                  />
+                </div>
+              )}
               
               <div className="space-y-4 flex-grow mb-6">
                 <div>

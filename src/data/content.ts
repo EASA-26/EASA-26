@@ -100,6 +100,7 @@ export const projectHistoryData = {
   projects: [
     {
       title: "PeopleModelling.AI",
+      image: "peoplemodelling-ai-ui.png",
       problem: "HR and project teams need a faster way to understand workforce availability, position profiles, succession options, and person-to-position fit across projects.",
       approach: "React and FastAPI people modelling application with analytics dashboards, data upload modules, succession recommendation, person-to-position matching, scoring rules, audit logs, persistent storage, and Databricks Llama-based inferencing support.",
       stakeholders: "HR",
