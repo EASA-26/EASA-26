@@ -38,9 +38,9 @@ export const introData = {
     ]
   },
   metrics: [
-    { id: 1, label: "AI Use Cases Pipeline", value: "24+" },
-    { id: 2, label: "Power Plant Domains Supported", value: "8" },
-    { id: 3, label: "Stakeholder Engagements", value: "15+" },
+    { id: 1, label: "AI Projects Pipeline", value: "17" },
+    { id: 2, label: "Active Pilots / Prototypes", value: "11" },
+    { id: 3, label: "Stakeholder Departments", value: "7" },
   ]
 };
 
