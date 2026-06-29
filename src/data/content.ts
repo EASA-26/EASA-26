@@ -38,7 +38,7 @@ export const introData = {
     ]
   },
   metrics: [
-    { id: 1, label: "AI Projects Pipeline", value: "17" },
+    { id: 1, label: "AI Projects Pipeline", value: "16" },
     { id: 2, label: "Active Pilots / Prototypes", value: "11" },
     { id: 3, label: "Stakeholder Departments", value: "7" },
   ]
@@ -92,7 +92,7 @@ export const orgStructureData = [
 
 export const projectHistoryData = {
   metrics: {
-    totalProjects: "17",
+    totalProjects: "16",
     activePilots: "11",
     deployedSolutions: "3",
     stakeholdersEngaged: "7"
@@ -187,6 +187,7 @@ export const projectHistoryData = {
     },
     {
       title: "WPS.AI",
+      image: "wps-ai-ui.png",
       problem: "WPS and PQR drafting is document-heavy and requires repeated technical preparation effort.",
       approach: "AI LLM assistant for WPS/PQR drafting, reference extraction, and engineering document preparation.",
       stakeholders: "Remaco RC",
@@ -235,14 +236,6 @@ export const projectHistoryData = {
       stakeholders: "HR",
       value: "Prototype supports AI-assisted succession decisions and talent pipeline review.",
       status: "Prototype"
-    },
-    {
-      title: "FM.AI",
-      problem: "Facilities or financial management use cases require clearer scope definition before implementation.",
-      approach: "Planned AI initiative pending detailed use case discovery, data assessment, and solution framing.",
-      stakeholders: "Engineering",
-      value: "Planned for future prioritization and feasibility assessment.",
-      status: "Planned"
     }
   ]
 };
