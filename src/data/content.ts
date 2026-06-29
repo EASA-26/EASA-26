@@ -109,6 +109,7 @@ export const projectHistoryData = {
     },
     {
       title: "Recruitment Filtration.AI",
+      image: "recruitment-filtration-ai-ui.png",
       problem: "HR needs to review a large volume of resumes efficiently and identify the most suitable candidates before interview shortlisting.",
       approach: "AI-assisted recruitment filtration application that parses resumes, compares candidate profiles against role requirements, ranks suitability, and supports structured pre-interview screening.",
       stakeholders: "HR",
@@ -133,11 +134,12 @@ export const projectHistoryData = {
       status: "Prototype"
     },
     {
-      title: "FINANCE.AI",
-      problem: "Financial modelling and scenario simulation are time-consuming when assumptions, scenarios, and outputs are handled manually.",
-      approach: "AI LLM concept for financial modelling, scenario simulation, and assumption-based analysis.",
+      title: "Financial Modelling.AI",
+      image: "financial-modelling-ai-ui.png",
+      problem: "Project finance modelling and scenario simulation are time-consuming when assumptions, tariff, returns, leverage, and model health are handled manually.",
+      approach: "AI-assisted financial modelling control center for project finance dashboards, scenario simulation, calculation support, model audit checks, and AI assistant review.",
       stakeholders: "Finance",
-      value: "Planned to support faster scenario comparison and financial decision preparation.",
+      value: "Planned to support faster project finance review, scenario comparison, investment decision preparation, and model quality checks.",
       status: "Planned"
     },
     {
@@ -159,6 +161,7 @@ export const projectHistoryData = {
     },
     {
       title: "Tech.AI",
+      image: "tech-ai-ui.png",
       problem: "Technical manuals for AHM are difficult to search quickly during engineering and operational support.",
       approach: "AI LLM technical manual assistant for AHM document search, summarization, and procedure explanation.",
       stakeholders: "AHM",
@@ -192,6 +195,7 @@ export const projectHistoryData = {
     },
     {
       title: "FFU.AI",
+      image: "ffu-ai-ui.png",
       problem: "Fit For Use evaluations require structured evidence gathering, technical review, and repeatable assessment flow.",
       approach: "AI LLM support for FFU evidence review, evaluation drafting, and engineering assessment assistance.",
       stakeholders: "Engineering",
@@ -200,8 +204,9 @@ export const projectHistoryData = {
     },
     {
       title: "LMS",
-      problem: "Staff assessment and learning progress need a consolidated digital management system.",
-      approach: "BI-enabled learning management system for staff assessment, progress tracking, and reporting.",
+      image: "lms-ai-ui.png",
+      problem: "Staff assessment and assessor marking sessions need a consolidated digital system with controlled access, clear marking flow, and progress visibility.",
+      approach: "Learning management and assessor marking portal for staff assessment, assessor session validation, marking workflows, progress tracking, and reporting.",
       stakeholders: "HR",
       value: "Prototype supports structured staff assessment and training visibility.",
       status: "Prototype"
@@ -224,6 +229,7 @@ export const projectHistoryData = {
     },
     {
       title: "Succession.AI",
+      image: "succession-ai-ui.png",
       problem: "Succession planning for R0, R1, and R2 roles needs AI-assisted candidate matching from E16 up to COO level.",
       approach: "AI LLM succession recommendation for role matching, candidate ranking, and readiness reasoning.",
       stakeholders: "HR",
