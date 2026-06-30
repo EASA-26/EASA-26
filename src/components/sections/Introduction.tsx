@@ -1,5 +1,6 @@
 import { introData } from '../../data/content';
 import { MetricCard } from '../MetricCard';
+import { VisitorCounter } from '../VisitorCounter';
 import { motion } from 'framer-motion';
 
 export function Introduction() {
@@ -17,10 +18,11 @@ export function Introduction() {
           className="mb-16"
         >
           <div>
-            <div className="flex items-center gap-4 mb-4">
+            <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <span className="px-3 py-1 rounded-full bg-electric-cyan/15 text-electric-cyan text-sm font-bold tracking-widest border border-electric-cyan/40 shadow-[0_0_18px_rgba(93,244,255,0.22)]">
                 {introData.acronym}
               </span>
+              <VisitorCounter />
             </div>
             <h1 className="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-electric-cyan to-accent-green mb-6 tracking-tight leading-tight">
               {introData.title}
