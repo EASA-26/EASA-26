@@ -35,7 +35,7 @@ function OrgCard({ member, featured = false, delay = 0 }: { member: OrgMember; f
 }
 
 export function OrgStructure() {
-  const [chiefEngineer, lead, platformManager, applicationManager, dataEngineer, devOpsEngineer] = orgStructureData;
+  const [chiefEngineer, lead, platformManager, applicationManager, dataEngineer, protegeDataEngineer, devOpsEngineer] = orgStructureData;
 
   return (
     <section id="org-structure" className="section-container">
@@ -69,6 +69,8 @@ export function OrgStructure() {
               <OrgCard member={platformManager} delay={0.1} />
               <div className="hidden md:block h-10 w-0.5 bg-electric-cyan/70 shadow-[0_0_10px_rgba(0,229,255,0.35)]" />
               <OrgCard member={dataEngineer} delay={0.2} />
+              <div className="hidden md:block h-10 w-0.5 bg-electric-cyan/70 shadow-[0_0_10px_rgba(0,229,255,0.35)]" />
+              <OrgCard member={protegeDataEngineer} delay={0.3} />
             </div>
 
             <div className="relative flex flex-col items-center">
