@@ -1,7 +1,10 @@
-import { orgStructureData } from '../../data/content';
+import { useState } from 'react';
+import { ChevronDown, UserRound } from 'lucide-react';
+import { orgStructureData, rizalSubordinateData } from '../../data/content';
 import { motion } from 'framer-motion';
 
 type OrgMember = (typeof orgStructureData)[number];
+type RizalSubordinate = (typeof rizalSubordinateData)[number];
 
 function OrgCard({ member, featured = false, delay = 0 }: { member: OrgMember; featured?: boolean; delay?: number }) {
   const photoSrc = member.photo ? `${import.meta.env.BASE_URL}${member.photo}` : undefined;
@@ -34,12 +37,100 @@ function OrgCard({ member, featured = false, delay = 0 }: { member: OrgMember; f
   );
 }
 
+function CompactOrgCard({
+  member,
+  expanded,
+  onToggle,
+  locked = false,
+  delay = 0,
+}: {
+  member: OrgMember | RizalSubordinate;
+  expanded: boolean;
+  onToggle?: () => void;
+  locked?: boolean;
+  delay?: number;
+}) {
+  const photoSrc = 'photo' in member && member.photo ? `${import.meta.env.BASE_URL}${member.photo}` : undefined;
+  const initials = member.name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('');
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.5, delay }}
+      className={`glass-card relative z-10 w-full overflow-hidden p-5 text-left transition-all ${locked ? 'border-accent-green/35 shadow-[0_0_28px_rgba(120,214,75,0.16)]' : ''}`}
+    >
+      <div className="flex items-start gap-4">
+        {photoSrc ? (
+          <img
+            src={photoSrc}
+            alt={member.name}
+            className="h-16 w-16 shrink-0 rounded-full border border-electric-cyan/50 object-cover shadow-[0_0_18px_rgba(37,216,255,0.18)]"
+          />
+        ) : (
+          <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-electric-cyan/35 bg-electric-cyan/10 text-lg font-bold text-electric-cyan shadow-[0_0_18px_rgba(37,216,255,0.14)]">
+            {initials}
+          </span>
+        )}
+
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h3 className="text-lg font-bold leading-snug text-white">{member.name}</h3>
+              <p className="mt-1 text-sm font-medium leading-snug text-electric-cyan">{member.role}</p>
+            </div>
+            {locked ? (
+              <span className="rounded-full border border-accent-green/30 bg-accent-green/10 px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-wider text-accent-green">
+                EASA
+              </span>
+            ) : (
+              <button
+                type="button"
+                onClick={onToggle}
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-electric-cyan/25 bg-white/5 text-electric-cyan transition hover:bg-electric-cyan/10"
+                aria-expanded={expanded}
+                aria-label={`${expanded ? 'Minimise' : 'Expand'} ${member.name}`}
+              >
+                <ChevronDown className={`h-5 w-5 transition-transform ${expanded ? 'rotate-180' : ''}`} aria-hidden="true" />
+              </button>
+            )}
+          </div>
+
+          {expanded && (
+            <div className="mt-4 border-t border-white/10 pt-4">
+              <p className="text-sm leading-relaxed text-slate-300">{member.responsibility}</p>
+              <span className="mt-3 inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-xs text-slate-300">
+                <UserRound className="h-3.5 w-3.5 text-electric-cyan" aria-hidden="true" />
+                {member.focus}
+              </span>
+            </div>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 export function OrgStructure() {
   const [chiefEngineer, lead, platformManager, applicationManager, dataEngineer, protegeDataEngineer, devOpsEngineer] = orgStructureData;
+  const [expandedReports, setExpandedReports] = useState<Record<string, boolean>>({});
+
+  const toggleReport = (name: string) => {
+    setExpandedReports((current) => ({
+      ...current,
+      [name]: !current[name],
+    }));
+  };
 
   return (
     <section id="org-structure" className="section-container">
-      <div className="max-w-5xl mx-auto w-full">
+      <div className="max-w-6xl mx-auto w-full">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -59,8 +150,27 @@ export function OrgStructure() {
             <div className="h-10 w-0.5 bg-electric-cyan/70 shadow-[0_0_10px_rgba(0,229,255,0.35)]" />
           </div>
 
-          <div className="flex justify-center">
-            <OrgCard member={lead} featured delay={0.05} />
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {rizalSubordinateData.map((member, index) => (
+              <CompactOrgCard
+                key={member.name}
+                member={member}
+                expanded={Boolean(expandedReports[member.name])}
+                onToggle={() => toggleReport(member.name)}
+                delay={0.05 + (index * 0.05)}
+              />
+            ))}
+            <div className="md:col-span-2 xl:col-span-2">
+              <CompactOrgCard member={lead} expanded locked delay={0.25} />
+            </div>
+          </div>
+
+          <div className="hidden md:flex justify-center">
+            <div className="h-10 w-0.5 bg-accent-green/70 shadow-[0_0_10px_rgba(120,214,75,0.35)]" />
+          </div>
+
+          <div className="mx-auto mb-8 max-w-xl rounded-full border border-accent-green/20 bg-accent-green/10 px-4 py-2 text-center text-xs font-bold uppercase tracking-widest text-accent-green">
+            Enterprise AI Solution Architect branch
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 max-w-4xl mx-auto md:mt-10">

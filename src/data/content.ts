@@ -91,6 +91,13 @@ export const orgStructureData = [
   { role: "Executive (AI DevOps Engineer)", name: "Muhammad Syazwan bin Hamidi", responsibility: "Implements CI/CD, automation, monitoring, recovery, and secure deployment environments for AI systems across enterprise and plant operations.", focus: "CI/CD, Observability, Deployment Reliability", photo: "executive-devops.png" }
 ];
 
+export const rizalSubordinateData = [
+  { role: "Senior Manager (Digital Infrastructure & Services)", name: "Lee Song Chow", responsibility: "Leads digital infrastructure, enterprise services, platform availability, and technology service enablement for Digital & Data delivery.", focus: "Digital Infrastructure, Enterprise Services, Platform Operations" },
+  { role: "Executive (Cyber Security)", name: "Mohamad Rezza bin Mohamad Ariff", responsibility: "Supports cyber security controls, risk coordination, secure technology adoption, and operational security activities across digital initiatives.", focus: "Cyber Security, Risk Controls, Secure Operations" },
+  { role: "Senior Manager (Digital Strategy & Transformation)", name: "Muhamad Hilmi bin Sufyan", responsibility: "Drives digital strategy, transformation planning, portfolio alignment, and change enablement across the Digital & Data function.", focus: "Digital Strategy, Transformation, Portfolio Alignment" },
+  { role: "Senior Manager (Advanced Data Analytics)", name: "Nik Mohd Hazman bin Che Hasan", responsibility: "Leads advanced analytics, data-driven insight delivery, analytical governance, and applied data science enablement.", focus: "Advanced Analytics, Data Science, Insight Delivery" }
+];
+
 export const projectHistoryData = {
   metrics: {
     totalProjects: "16",
