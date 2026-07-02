@@ -92,10 +92,10 @@ export const orgStructureData = [
 ];
 
 export const rizalSubordinateData = [
-  { role: "Senior Manager (Digital Infrastructure & Services)", name: "Lee Song Chow", responsibility: "Leads digital infrastructure, enterprise services, platform availability, and technology service enablement for Digital & Data delivery.", focus: "Digital Infrastructure, Enterprise Services, Platform Operations" },
-  { role: "Executive (Cyber Security)", name: "Mohamad Rezza bin Mohamad Ariff", responsibility: "Supports cyber security controls, risk coordination, secure technology adoption, and operational security activities across digital initiatives.", focus: "Cyber Security, Risk Controls, Secure Operations" },
-  { role: "Senior Manager (Digital Strategy & Transformation)", name: "Muhamad Hilmi bin Sufyan", responsibility: "Drives digital strategy, transformation planning, portfolio alignment, and change enablement across the Digital & Data function.", focus: "Digital Strategy, Transformation, Portfolio Alignment" },
-  { role: "Senior Manager (Advanced Data Analytics)", name: "Nik Mohd Hazman bin Che Hasan", responsibility: "Leads advanced analytics, data-driven insight delivery, analytical governance, and applied data science enablement.", focus: "Advanced Analytics, Data Science, Insight Delivery" }
+  { role: "Senior Manager (Digital Infrastructure & Services)", name: "Lee Song Chow", responsibility: "Leads digital infrastructure, enterprise services, platform availability, and technology service enablement for Digital & Data delivery.", focus: "Digital Infrastructure, Enterprise Services, Platform Operations", photo: "lee-song-chow.png" },
+  { role: "Executive (Cyber Security)", name: "Mohamad Rezza bin Mohamad Ariff", responsibility: "Supports cyber security controls, risk coordination, secure technology adoption, and operational security activities across digital initiatives.", focus: "Cyber Security, Risk Controls, Secure Operations", photo: "mohamad-rezza.png" },
+  { role: "Senior Manager (Digital Strategy & Transformation)", name: "Muhamad Hilmi bin Sufyan", responsibility: "Drives digital strategy, transformation planning, portfolio alignment, and change enablement across the Digital & Data function.", focus: "Digital Strategy, Transformation, Portfolio Alignment", photo: "muhamad-hilmi.png" },
+  { role: "Senior Manager (Advanced Data Analytics)", name: "Nik Mohd Hazman bin Che Hasan", responsibility: "Leads advanced analytics, data-driven insight delivery, analytical governance, and applied data science enablement.", focus: "Advanced Analytics, Data Science, Insight Delivery", photo: "nik-mohd-hazman.png" }
 ];
 
 export const projectHistoryData = {

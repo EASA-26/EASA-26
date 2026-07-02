@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, UserRound } from 'lucide-react';
+import { ChevronDown, UserRound, UsersRound } from 'lucide-react';
 import { orgStructureData, rizalSubordinateData } from '../../data/content';
 import { motion } from 'framer-motion';
 
@@ -39,14 +39,10 @@ function OrgCard({ member, featured = false, delay = 0 }: { member: OrgMember; f
 
 function CompactOrgCard({
   member,
-  expanded,
-  onToggle,
   locked = false,
   delay = 0,
 }: {
   member: OrgMember | RizalSubordinate;
-  expanded: boolean;
-  onToggle?: () => void;
   locked?: boolean;
   delay?: number;
 }) {
@@ -85,32 +81,18 @@ function CompactOrgCard({
               <h3 className="text-lg font-bold leading-snug text-white">{member.name}</h3>
               <p className="mt-1 text-sm font-medium leading-snug text-electric-cyan">{member.role}</p>
             </div>
-            {locked ? (
-              <span className="rounded-full border border-accent-green/30 bg-accent-green/10 px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-wider text-accent-green">
-                EASA
-              </span>
-            ) : (
-              <button
-                type="button"
-                onClick={onToggle}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-electric-cyan/25 bg-white/5 text-electric-cyan transition hover:bg-electric-cyan/10"
-                aria-expanded={expanded}
-                aria-label={`${expanded ? 'Minimise' : 'Expand'} ${member.name}`}
-              >
-                <ChevronDown className={`h-5 w-5 transition-transform ${expanded ? 'rotate-180' : ''}`} aria-hidden="true" />
-              </button>
-            )}
+            <span className={`rounded-full border px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-wider ${locked ? 'border-accent-green/30 bg-accent-green/10 text-accent-green' : 'border-electric-cyan/25 bg-electric-cyan/10 text-electric-cyan'}`}>
+              {locked ? 'EASA' : 'Rizal'}
+            </span>
           </div>
 
-          {expanded && (
-            <div className="mt-4 border-t border-white/10 pt-4">
-              <p className="text-sm leading-relaxed text-slate-300">{member.responsibility}</p>
-              <span className="mt-3 inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-xs text-slate-300">
-                <UserRound className="h-3.5 w-3.5 text-electric-cyan" aria-hidden="true" />
-                {member.focus}
-              </span>
-            </div>
-          )}
+          <div className="mt-4 border-t border-white/10 pt-4">
+            <p className="text-sm leading-relaxed text-slate-300">{member.responsibility}</p>
+            <span className="mt-3 inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-xs text-slate-300">
+              <UserRound className="h-3.5 w-3.5 text-electric-cyan" aria-hidden="true" />
+              {member.focus}
+            </span>
+          </div>
         </div>
       </div>
     </motion.div>
@@ -119,14 +101,7 @@ function CompactOrgCard({
 
 export function OrgStructure() {
   const [chiefEngineer, lead, platformManager, applicationManager, dataEngineer, protegeDataEngineer, devOpsEngineer] = orgStructureData;
-  const [expandedReports, setExpandedReports] = useState<Record<string, boolean>>({});
-
-  const toggleReport = (name: string) => {
-    setExpandedReports((current) => ({
-      ...current,
-      [name]: !current[name],
-    }));
-  };
+  const [showRizalReports, setShowRizalReports] = useState(true);
 
   return (
     <section id="org-structure" className="section-container">
@@ -143,30 +118,54 @@ export function OrgStructure() {
 
         <div className="mt-12">
           <div className="flex justify-center">
-            <OrgCard member={chiefEngineer} featured />
-          </div>
-
-          <div className="hidden md:flex justify-center">
-            <div className="h-10 w-0.5 bg-electric-cyan/70 shadow-[0_0_10px_rgba(0,229,255,0.35)]" />
-          </div>
-
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {rizalSubordinateData.map((member, index) => (
-              <CompactOrgCard
-                key={member.name}
-                member={member}
-                expanded={Boolean(expandedReports[member.name])}
-                onToggle={() => toggleReport(member.name)}
-                delay={0.05 + (index * 0.05)}
-              />
-            ))}
-            <div className="md:col-span-2 xl:col-span-2">
-              <CompactOrgCard member={lead} expanded locked delay={0.25} />
+            <div className="relative w-full md:max-w-xl">
+              <OrgCard member={chiefEngineer} featured />
+              <button
+                type="button"
+                onClick={() => setShowRizalReports((current) => !current)}
+                className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-lg border border-electric-cyan/35 bg-navy-900/80 px-3 py-2 text-xs font-bold uppercase tracking-wider text-electric-cyan shadow-[0_0_18px_rgba(37,216,255,0.2)] backdrop-blur-md transition hover:bg-electric-cyan/10"
+                aria-expanded={showRizalReports}
+                aria-label={`${showRizalReports ? 'Minimise' : 'Expand'} Rizal direct reports`}
+              >
+                <UsersRound className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">Direct Reports</span>
+                <ChevronDown className={`h-4 w-4 transition-transform ${showRizalReports ? 'rotate-180' : ''}`} aria-hidden="true" />
+              </button>
             </div>
           </div>
 
           <div className="hidden md:flex justify-center">
-            <div className="h-10 w-0.5 bg-accent-green/70 shadow-[0_0_10px_rgba(120,214,75,0.35)]" />
+            <div className="h-12 w-1 rounded-full bg-electric-cyan shadow-[0_0_18px_rgba(93,244,255,0.65)]" />
+          </div>
+
+          {showRizalReports && (
+            <div className="relative mb-10">
+              <div className="hidden md:block absolute left-1/2 top-0 h-7 w-1 -translate-x-1/2 rounded-full bg-electric-cyan shadow-[0_0_18px_rgba(93,244,255,0.65)]" />
+              <div className="hidden md:block absolute left-[12.5%] right-[12.5%] top-7 h-1 rounded-full bg-electric-cyan/85 shadow-[0_0_18px_rgba(93,244,255,0.55)]" />
+              <div className="grid grid-cols-1 gap-5 pt-10 md:grid-cols-2 xl:grid-cols-4">
+                {rizalSubordinateData.map((member, index) => (
+                  <div key={member.name} className="relative">
+                    <div className="hidden md:block absolute -top-10 left-1/2 h-10 w-1 -translate-x-1/2 rounded-full bg-electric-cyan/85 shadow-[0_0_18px_rgba(93,244,255,0.55)]" />
+                    <CompactOrgCard
+                      member={member}
+                      delay={0.05 + (index * 0.05)}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="flex justify-center">
+            <div className="h-12 w-1 rounded-full bg-accent-green shadow-[0_0_18px_rgba(120,214,75,0.65)]" />
+          </div>
+
+          <div className="mx-auto mb-8 max-w-xl">
+            <CompactOrgCard member={lead} locked delay={0.25} />
+          </div>
+
+          <div className="hidden md:flex justify-center">
+            <div className="h-10 w-1 rounded-full bg-accent-green shadow-[0_0_18px_rgba(120,214,75,0.65)]" />
           </div>
 
           <div className="mx-auto mb-8 max-w-xl rounded-full border border-accent-green/20 bg-accent-green/10 px-4 py-2 text-center text-xs font-bold uppercase tracking-widest text-accent-green">
