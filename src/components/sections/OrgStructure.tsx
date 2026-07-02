@@ -102,6 +102,9 @@ function CompactOrgCard({
 export function OrgStructure() {
   const [chiefEngineer, lead, platformManager, applicationManager, dataEngineer, protegeDataEngineer, devOpsEngineer] = orgStructureData;
   const [showRizalReports, setShowRizalReports] = useState(true);
+  const visibleRizalReports: Array<OrgMember | RizalSubordinate> = showRizalReports
+    ? [rizalSubordinateData[0], rizalSubordinateData[1], lead, rizalSubordinateData[2], rizalSubordinateData[3]]
+    : [lead];
 
   return (
     <section id="org-structure" className="section-container">
@@ -138,30 +141,27 @@ export function OrgStructure() {
             <div className="h-12 w-1 rounded-full bg-electric-cyan shadow-[0_0_18px_rgba(93,244,255,0.65)]" />
           </div>
 
-          {showRizalReports && (
-            <div className="relative mb-10">
+          <div className="relative mb-10">
+            {showRizalReports ? (
+              <>
+                <div className="hidden md:block absolute left-1/2 top-0 h-7 w-1 -translate-x-1/2 rounded-full bg-electric-cyan shadow-[0_0_18px_rgba(93,244,255,0.65)]" />
+                <div className="hidden md:block absolute left-[10%] right-[10%] top-7 h-1 rounded-full bg-electric-cyan shadow-[0_0_18px_rgba(93,244,255,0.65)]" />
+              </>
+            ) : (
               <div className="hidden md:block absolute left-1/2 top-0 h-7 w-1 -translate-x-1/2 rounded-full bg-electric-cyan shadow-[0_0_18px_rgba(93,244,255,0.65)]" />
-              <div className="hidden md:block absolute left-[12.5%] right-[12.5%] top-7 h-1 rounded-full bg-electric-cyan/85 shadow-[0_0_18px_rgba(93,244,255,0.55)]" />
-              <div className="grid grid-cols-1 gap-5 pt-10 md:grid-cols-2 xl:grid-cols-4">
-                {rizalSubordinateData.map((member, index) => (
-                  <div key={member.name} className="relative">
-                    <div className="hidden md:block absolute -top-10 left-1/2 h-10 w-1 -translate-x-1/2 rounded-full bg-electric-cyan/85 shadow-[0_0_18px_rgba(93,244,255,0.55)]" />
-                    <CompactOrgCard
-                      member={member}
-                      delay={0.05 + (index * 0.05)}
-                    />
-                  </div>
-                ))}
-              </div>
+            )}
+            <div className={`grid grid-cols-1 gap-5 pt-10 md:grid-cols-2 lg:grid-cols-3 ${showRizalReports ? 'xl:grid-cols-5' : 'mx-auto max-w-xl md:grid-cols-1'}`}>
+              {visibleRizalReports.map((member, index) => (
+                <div key={member.name} className="relative">
+                  <div className={`hidden md:block absolute -top-10 left-1/2 h-10 w-1 -translate-x-1/2 rounded-full bg-electric-cyan shadow-[0_0_18px_rgba(93,244,255,0.65)] ${!showRizalReports ? 'bg-accent-green shadow-[0_0_18px_rgba(120,214,75,0.65)]' : ''}`} />
+                  <CompactOrgCard
+                    member={member}
+                    locked={member.name === lead.name}
+                    delay={0.05 + (index * 0.05)}
+                  />
+                </div>
+              ))}
             </div>
-          )}
-
-          <div className="flex justify-center">
-            <div className="h-12 w-1 rounded-full bg-accent-green shadow-[0_0_18px_rgba(120,214,75,0.65)]" />
-          </div>
-
-          <div className="mx-auto mb-8 max-w-xl">
-            <CompactOrgCard member={lead} locked delay={0.25} />
           </div>
 
           <div className="hidden md:flex justify-center">
