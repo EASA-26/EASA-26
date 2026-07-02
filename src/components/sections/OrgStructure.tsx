@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 import { ChevronDown, UserRound, UsersRound } from 'lucide-react';
 import { orgStructureData, rizalSubordinateData } from '../../data/content';
 import { motion } from 'framer-motion';
@@ -6,7 +7,7 @@ import { motion } from 'framer-motion';
 type OrgMember = (typeof orgStructureData)[number];
 type RizalSubordinate = (typeof rizalSubordinateData)[number];
 
-function OrgCard({ member, featured = false, delay = 0 }: { member: OrgMember; featured?: boolean; delay?: number }) {
+function OrgCard({ member, featured = false, delay = 0, action }: { member: OrgMember; featured?: boolean; delay?: number; action?: ReactNode }) {
   const photoSrc = member.photo ? `${import.meta.env.BASE_URL}${member.photo}` : undefined;
 
   return (
@@ -33,6 +34,11 @@ function OrgCard({ member, featured = false, delay = 0 }: { member: OrgMember; f
       <span className="inline-block px-3 py-1 bg-white/5 rounded-full text-xs text-slate-300">
         {member.focus}
       </span>
+      {action && (
+        <div className="mt-5 flex justify-center">
+          {action}
+        </div>
+      )}
     </motion.div>
   );
 }
@@ -150,18 +156,23 @@ export function OrgStructure() {
         <div className="mt-12">
           <div className="flex justify-center">
             <div className="relative w-full md:max-w-xl">
-              <OrgCard member={chiefEngineer} featured />
-              <button
-                type="button"
-                onClick={() => setShowRizalReports((current) => !current)}
-                className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-lg border border-electric-cyan/35 bg-navy-900/80 px-3 py-2 text-xs font-bold uppercase tracking-wider text-electric-cyan shadow-[0_0_18px_rgba(37,216,255,0.2)] backdrop-blur-md transition hover:bg-electric-cyan/10"
-                aria-expanded={showRizalReports}
-                aria-label={`${showRizalReports ? 'Minimise' : 'Expand'} Rizal direct reports`}
-              >
-                <UsersRound className="h-4 w-4" aria-hidden="true" />
-                <span className="hidden sm:inline">Direct Reports</span>
-                <ChevronDown className={`h-4 w-4 transition-transform ${showRizalReports ? 'rotate-180' : ''}`} aria-hidden="true" />
-              </button>
+              <OrgCard
+                member={chiefEngineer}
+                featured
+                action={
+                  <button
+                    type="button"
+                    onClick={() => setShowRizalReports((current) => !current)}
+                    className="inline-flex items-center gap-2 rounded-lg border border-electric-cyan/40 bg-electric-cyan/10 px-4 py-2 text-xs font-bold uppercase tracking-wider text-electric-cyan shadow-[0_0_18px_rgba(37,216,255,0.24)] transition hover:bg-electric-cyan/20 hover:text-white focus:outline-none focus:ring-2 focus:ring-electric-cyan/50"
+                    aria-expanded={showRizalReports}
+                    aria-label={`${showRizalReports ? 'Hide' : 'Show'} other Rizal direct reports`}
+                  >
+                    <UsersRound className="h-4 w-4" aria-hidden="true" />
+                    <span>{showRizalReports ? 'Hide 4 Reports' : 'Show 4 Reports'}</span>
+                    <ChevronDown className={`h-4 w-4 transition-transform ${showRizalReports ? 'rotate-180' : ''}`} aria-hidden="true" />
+                  </button>
+                }
+              />
             </div>
           </div>
 
