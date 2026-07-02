@@ -68,11 +68,14 @@ function CompactOrgCard({
     >
       <div className="flex items-start gap-4">
         {photoSrc ? (
-          <img
-            src={photoSrc}
-            alt={member.name}
-            className="h-16 w-16 shrink-0 rounded-full border border-electric-cyan/50 object-cover shadow-[0_0_18px_rgba(37,216,255,0.18)]"
-          />
+          <div className="ai-avatar-frame shrink-0" style={{ width: '5rem', height: '5rem' }}>
+            <img
+              src={photoSrc}
+              alt={member.name}
+              className="ai-avatar-image"
+            />
+            <span className="ai-avatar-shimmer" />
+          </div>
         ) : (
           <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-electric-cyan/35 bg-electric-cyan/10 text-lg font-bold text-electric-cyan shadow-[0_0_18px_rgba(37,216,255,0.14)]">
             {initials}
@@ -119,7 +122,7 @@ function CompactOrgCard({
 
 export function OrgStructure() {
   const [chiefEngineer, lead, platformManager, applicationManager, dataEngineer, protegeDataEngineer, devOpsEngineer] = orgStructureData;
-  const [showRizalReports, setShowRizalReports] = useState(true);
+  const [showRizalReports, setShowRizalReports] = useState(false);
   const [expandedReports, setExpandedReports] = useState<Record<string, boolean>>({});
   const visibleRizalReports: Array<OrgMember | RizalSubordinate> = showRizalReports
     ? [rizalSubordinateData[0], rizalSubordinateData[1], lead, rizalSubordinateData[2], rizalSubordinateData[3]]
@@ -185,23 +188,30 @@ export function OrgStructure() {
                   className="drop-shadow-[0_0_10px_rgba(93,244,255,0.75)]"
                 />
               </svg>
+            ) : null}
+            {showRizalReports ? (
+              <div className="grid grid-cols-1 gap-5 pt-16 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+                {visibleRizalReports.map((member, index) => (
+                  <div key={member.name} className="relative">
+                    <div className="hidden md:block absolute -top-16 left-1/2 h-16 w-1 -translate-x-1/2 rounded-full bg-electric-cyan shadow-[0_0_18px_rgba(93,244,255,0.65)] xl:hidden" />
+                    <CompactOrgCard
+                      member={member}
+                      expanded={member.name === lead.name || Boolean(expandedReports[member.name])}
+                      locked={member.name === lead.name}
+                      onToggle={() => toggleReport(member.name)}
+                      delay={0.05 + (index * 0.05)}
+                    />
+                  </div>
+                ))}
+              </div>
             ) : (
-              <div className="hidden md:block absolute left-1/2 top-0 h-16 w-1 -translate-x-1/2 rounded-full bg-accent-green shadow-[0_0_18px_rgba(120,214,75,0.65)]" />
-            )}
-            <div className={`grid grid-cols-1 gap-5 pt-16 md:grid-cols-2 lg:grid-cols-3 ${showRizalReports ? 'xl:grid-cols-5' : 'mx-auto max-w-xl md:grid-cols-1'}`}>
-              {visibleRizalReports.map((member, index) => (
-                <div key={member.name} className="relative">
-                  <div className={`hidden md:block absolute -top-16 left-1/2 h-16 w-1 -translate-x-1/2 rounded-full bg-electric-cyan shadow-[0_0_18px_rgba(93,244,255,0.65)] xl:hidden ${!showRizalReports ? 'bg-accent-green shadow-[0_0_18px_rgba(120,214,75,0.65)]' : ''}`} />
-                  <CompactOrgCard
-                    member={member}
-                    expanded={member.name === lead.name || Boolean(expandedReports[member.name])}
-                    locked={member.name === lead.name}
-                    onToggle={() => toggleReport(member.name)}
-                    delay={0.05 + (index * 0.05)}
-                  />
+              <div className="mx-auto max-w-xl pt-16">
+                <div className="relative">
+                  <div className="hidden md:block absolute -top-16 left-1/2 h-16 w-1 -translate-x-1/2 rounded-full bg-accent-green shadow-[0_0_18px_rgba(120,214,75,0.65)]" />
+                  <OrgCard member={lead} featured delay={0.05} />
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
           </div>
 
           <div className="hidden md:flex justify-center">
