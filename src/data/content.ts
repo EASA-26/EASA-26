@@ -16,6 +16,7 @@ export const navigationData = [
   { id: 'org-structure', label: 'Org Structure' },
   { id: 'project-history', label: 'Project History' },
   { id: 'engage-with-us', label: 'Engage With Us' },
+  { id: 'admin', label: 'Admin' },
 ];
 
 export const introData = {
