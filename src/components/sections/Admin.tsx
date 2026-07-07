@@ -7,6 +7,7 @@ import { projectHistoryData } from '../../data/content';
 const ADMIN_PASSWORD = 'easa26';
 const ADMIN_UNLOCK_KEY = 'easa-admin-unlocked';
 const ADMIN_STORAGE_KEY = 'easa-project-management-updates';
+const EASA_KPI_STORAGE_KEY = 'easa-kpi-management-updates';
 const STATUS_OPTIONS = ['Prototype', 'Deployed', 'Pilot', 'Planned'] as const;
 
 type Project = (typeof projectHistoryData.projects)[number];
@@ -22,6 +23,45 @@ type AdminProjectUpdate = {
 
 type AdminProjectUpdates = Record<string, AdminProjectUpdate>;
 type AdminPage = 'project-update' | 'kpi';
+type KpiPage = 'overview' | 'easa-kpi';
+type EasaKpiRow = Record<string, string>;
+
+const EASA_KPI_COLUMNS = [
+  'Strategic Objectives',
+  'KPIs',
+  'FY2026 Target',
+  '%',
+  'KPI Target Justifications - Col G',
+  '% - Col I',
+  'KPI Target Justifications - Col J',
+  '% - Col L',
+  'KPI Target Justifications - Col M',
+] as const;
+
+const EASA_KPI_DEFAULT_ROWS: EasaKpiRow[] = [
+  {
+    'Strategic Objectives': 'KPI 1 : Enterprise AI Solution Delivery & Platform Cost Performance\n\nStatement: Deliver approved enterprise AI solution and AI data platform initiatives within approved timeline, scope, cost, cybersecurity, governance and quality requirements.',
+    KPIs: '[#/%] Enterprise AI Solution Delivery & Platform Cost Performance Index',
+    'FY2026 Target': 'BT: < 85%\nMT: 85% - 94%\nET: >= 95%',
+    '%': '15%',
+    'KPI Target Justifications - Col G': "Description: Measures EASA's ability to deliver approved enterprise AI solution and AI data platform initiatives with governance, quality, cybersecurity, timeline, scope and cost discipline.\n\nOutcome: Approved AI initiatives are delivered in a controlled, secure and governed manner with proper closure evidence.\n\nMeasurement = approved AI initiatives delivered as planned / total approved AI initiatives x 100",
+    '% - Col I': '15%',
+    'KPI Target Justifications - Col J': 'Initiatives:\nCompletion of:\n- Enterprise AI solution initiatives\n- AI data platform initiatives\n- Governance and cybersecurity readiness\n- Quality, documentation and closure evidence\n\nAdditional Involvement:',
+    '% - Col L': '15%',
+    'KPI Target Justifications - Col M': 'Initiatives:\nCompletion of:\n- Enterprise AI delivery roadmap\n- Cross-functional delivery coordination\n- AI platform readiness and adoption support\n- Project performance reporting and risk tracking\n\nAdditional Involvement:',
+  },
+  {
+    'Strategic Objectives': 'KPI 2 : AI Operational Value Creation & Databricks Cost Optimization\n\nStatement: Realize measurable value creation from deployed AI solutions and approved Databricks cost optimization through operational efficiency improvement, reliability improvement, AI adoption, cost saving or avoidance and EBIT uplift contribution.',
+    KPIs: '[RM] AI Operational Value Creation & Databricks Cost Optimization',
+    'FY2026 Target': 'BT: < RM3 million\nMT: RM3 million - RM5 million\nET: > RM5 million',
+    '%': '15%',
+    'KPI Target Justifications - Col G': 'Description: Measures verified financial and operational value from deployed AI initiatives, including operational improvement, cost avoidance, EBIT contribution and Databricks spend saving or avoidance. Databricks cost optimization is measured only under this KPI.\n\nOutcome: AI initiatives create measurable business value and platform cost efficiency, supported by validated benefit evidence.\n\nMeasurement = verified value creation from deployed AI solutions + verified Databricks cost saving / cost avoidance',
+    '% - Col I': '15%',
+    'KPI Target Justifications - Col J': 'Initiatives:\nCompletion of:\n- AI benefit realization tracking\n- Value creation validation\n- Databricks cost optimization actions\n- AI adoption and operational improvement reporting\n\nAdditional Involvement:',
+    '% - Col L': '15%',
+    'KPI Target Justifications - Col M': 'Initiatives:\nCompletion of:\n- Benefit validation with business owner / Finance\n- Cost saving or cost avoidance calculation\n- Databricks spend report and optimization evidence\n- EBIT uplift / operational value reporting\n\nAdditional Involvement:',
+  },
+];
 
 const createDefaultUpdate = (project: Project): AdminProjectUpdate => ({
   isVisible: true,
@@ -63,6 +103,19 @@ const saveUpdates = (updates: AdminProjectUpdates) => {
   localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(updates));
 };
 
+const loadSavedKpiRows = () => {
+  try {
+    const saved = localStorage.getItem(EASA_KPI_STORAGE_KEY);
+    return saved ? JSON.parse(saved) as EasaKpiRow[] : EASA_KPI_DEFAULT_ROWS;
+  } catch {
+    return EASA_KPI_DEFAULT_ROWS;
+  }
+};
+
+const saveKpiRows = (rows: EasaKpiRow[]) => {
+  localStorage.setItem(EASA_KPI_STORAGE_KEY, JSON.stringify(rows));
+};
+
 export function Admin() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -83,6 +136,10 @@ export function Admin() {
   const [exportError, setExportError] = useState('');
   const [maximizedProjectTitle, setMaximizedProjectTitle] = useState<string | null>(null);
   const [activeAdminPage, setActiveAdminPage] = useState<AdminPage>('project-update');
+  const [activeKpiPage, setActiveKpiPage] = useState<KpiPage>('overview');
+  const [kpiRows, setKpiRows] = useState<EasaKpiRow[]>(() => loadSavedKpiRows());
+  const [kpiLastSaved, setKpiLastSaved] = useState('');
+  const [maximizedKpiIndex, setMaximizedKpiIndex] = useState<number | null>(null);
 
   const projects = projectHistoryData.projects;
   const getProjectUpdate = (project: Project) => updates[project.title] ?? createDefaultUpdate(project);
@@ -97,6 +154,7 @@ export function Admin() {
   const deployedCount = statusSummary.find((item) => item.status === 'Deployed')?.count ?? 0;
   const activeBuildCount = visibleProjects.filter((project) => ['Prototype', 'Pilot'].includes(getProjectUpdate(project).status)).length;
   const plannedCount = statusSummary.find((item) => item.status === 'Planned')?.count ?? 0;
+  const maximizedKpiRow = maximizedKpiIndex !== null ? kpiRows[maximizedKpiIndex] : undefined;
 
   const handleUnlock = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -174,6 +232,28 @@ export function Admin() {
     setUpdates(nextUpdates);
     saveUpdates(nextUpdates);
     setLastSaved(savedAt);
+  };
+
+  const handleKpiCellUpdate = (rowIndex: number, column: string, value: string) => {
+    setKpiRows((currentRows) => currentRows.map((row, index) => (
+      index === rowIndex ? { ...row, [column]: value } : row
+    )));
+  };
+
+  const handleSaveKpiRows = () => {
+    const savedAt = new Date().toLocaleString('en-MY', {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    });
+
+    saveKpiRows(kpiRows);
+    setKpiLastSaved(savedAt);
+  };
+
+  const handleResetKpiRows = () => {
+    setKpiRows(EASA_KPI_DEFAULT_ROWS);
+    saveKpiRows(EASA_KPI_DEFAULT_ROWS);
+    setKpiLastSaved('Reset to Excel template');
   };
 
   const handleExportPowerPoint = async () => {
@@ -684,8 +764,8 @@ export function Admin() {
                   <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
                     <div>
                       <span className="text-xs font-bold uppercase tracking-[0.25em] text-electric-cyan">KPI Dashboard</span>
-                      <h3 className="mt-2 text-2xl font-black text-white">Management KPI Snapshot</h3>
-                      <p className="mt-2 text-sm text-slate-400">Current KPI view is calculated from visible projects in Admin.</p>
+                      <h3 className="mt-2 text-2xl font-black text-white">Management KPI Workspace</h3>
+                      <p className="mt-2 text-sm text-slate-400">Use Overview for project KPI snapshot or EASA-KPI for the editable Excel KPI template.</p>
                     </div>
                     <button
                       type="button"
@@ -698,79 +778,224 @@ export function Admin() {
                   </div>
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+                <div className="inline-flex rounded-xl border border-electric-cyan/20 bg-navy-900/55 p-1">
                   {[
-                    { label: 'Visible Projects', value: visibleProjects.length, tone: 'text-white' },
-                    { label: 'Deployed', value: deployedCount, tone: 'text-accent-green' },
-                    { label: 'Pilot / Prototype', value: activeBuildCount, tone: 'text-electric-cyan' },
-                    { label: 'Planned', value: plannedCount, tone: 'text-sky-300' },
-                    { label: 'Hidden', value: hiddenProjects.length, tone: 'text-orange-300' },
-                  ].map((metric) => (
-                    <div key={metric.label} className="glass-card p-5">
-                      <div className={`text-4xl font-black ${metric.tone}`}>{metric.value}</div>
-                      <div className="mt-2 text-xs font-bold uppercase tracking-widest text-slate-400">{metric.label}</div>
-                    </div>
+                    { id: 'overview' as const, label: 'Overview' },
+                    { id: 'easa-kpi' as const, label: 'EASA-KPI' },
+                  ].map((page) => (
+                    <button
+                      key={page.id}
+                      type="button"
+                      onClick={() => setActiveKpiPage(page.id)}
+                      className={`rounded-lg px-5 py-3 text-sm font-bold transition ${
+                        activeKpiPage === page.id
+                          ? 'bg-electric-cyan/15 text-electric-cyan shadow-[0_0_18px_rgba(93,244,255,0.2)]'
+                          : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                      }`}
+                    >
+                      {page.label}
+                    </button>
                   ))}
                 </div>
 
-                <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-                  <div className="glass-card p-6">
-                    <h4 className="mb-5 text-lg font-bold text-white">Status Breakdown</h4>
-                    <div className="space-y-4">
-                      {statusSummary.map((item) => {
-                        const percentage = visibleProjects.length ? Math.round((item.count / visibleProjects.length) * 100) : 0;
-
-                        return (
-                          <div key={item.status}>
-                            <div className="mb-2 flex items-center justify-between text-sm">
-                              <span className="font-bold" style={{ color: `#${getStatusColor(item.status)}` }}>{item.status}</span>
-                              <span className="text-slate-300">{item.count} ({percentage}%)</span>
-                            </div>
-                            <div className="h-3 overflow-hidden rounded-full bg-navy-900/80">
-                              <div
-                                className="h-full rounded-full"
-                                style={{ width: `${percentage}%`, backgroundColor: `#${getStatusColor(item.status)}` }}
-                              />
-                            </div>
-                          </div>
-                        );
-                      })}
+                {activeKpiPage === 'overview' ? (
+                  <>
+                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+                      {[
+                        { label: 'Visible Projects', value: visibleProjects.length, tone: 'text-white' },
+                        { label: 'Deployed', value: deployedCount, tone: 'text-accent-green' },
+                        { label: 'Pilot / Prototype', value: activeBuildCount, tone: 'text-electric-cyan' },
+                        { label: 'Planned', value: plannedCount, tone: 'text-sky-300' },
+                        { label: 'Hidden', value: hiddenProjects.length, tone: 'text-orange-300' },
+                      ].map((metric) => (
+                        <div key={metric.label} className="glass-card p-5">
+                          <div className={`text-4xl font-black ${metric.tone}`}>{metric.value}</div>
+                          <div className="mt-2 text-xs font-bold uppercase tracking-widest text-slate-400">{metric.label}</div>
+                        </div>
+                      ))}
                     </div>
-                  </div>
 
-                  <div className="glass-card overflow-hidden">
-                    <div className="border-b border-white/10 p-6">
-                      <h4 className="text-lg font-bold text-white">Visible Project KPI List</h4>
-                      <p className="mt-1 text-sm text-slate-400">Status and stakeholder view for management tracking.</p>
+                    <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
+                      <div className="glass-card p-6">
+                        <h4 className="mb-5 text-lg font-bold text-white">Status Breakdown</h4>
+                        <div className="space-y-4">
+                          {statusSummary.map((item) => {
+                            const percentage = visibleProjects.length ? Math.round((item.count / visibleProjects.length) * 100) : 0;
+
+                            return (
+                              <div key={item.status}>
+                                <div className="mb-2 flex items-center justify-between text-sm">
+                                  <span className="font-bold" style={{ color: `#${getStatusColor(item.status)}` }}>{item.status}</span>
+                                  <span className="text-slate-300">{item.count} ({percentage}%)</span>
+                                </div>
+                                <div className="h-3 overflow-hidden rounded-full bg-navy-900/80">
+                                  <div
+                                    className="h-full rounded-full"
+                                    style={{ width: `${percentage}%`, backgroundColor: `#${getStatusColor(item.status)}` }}
+                                  />
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      <div className="glass-card overflow-hidden">
+                        <div className="border-b border-white/10 p-6">
+                          <h4 className="text-lg font-bold text-white">Visible Project KPI List</h4>
+                          <p className="mt-1 text-sm text-slate-400">Status and stakeholder view for management tracking.</p>
+                        </div>
+                        <div className="overflow-x-auto">
+                          <table className="w-full min-w-[720px] border-collapse text-left">
+                            <thead className="bg-navy-800/80 text-xs uppercase tracking-widest text-electric-cyan">
+                              <tr>
+                                <th className="px-4 py-3">Project</th>
+                                <th className="px-4 py-3">Status</th>
+                                <th className="px-4 py-3">Stakeholder</th>
+                                <th className="px-4 py-3">Progress</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {visibleProjects.map((project) => {
+                                const update = getProjectUpdate(project);
+
+                                return (
+                                  <tr key={project.title} className="border-t border-white/10 odd:bg-white/[0.025]">
+                                    <td className="px-4 py-3 text-sm font-bold text-white">{project.title}</td>
+                                    <td className="px-4 py-3 text-sm font-bold" style={{ color: `#${getStatusColor(update.status)}` }}>{update.status}</td>
+                                    <td className="px-4 py-3 text-sm text-slate-300">{project.stakeholders}</td>
+                                    <td className="px-4 py-3 text-sm text-slate-300">{compactSlideText(update.currentProgress, 110)}</td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
                     </div>
-                    <div className="overflow-x-auto">
-                      <table className="w-full min-w-[720px] border-collapse text-left">
-                        <thead className="bg-navy-800/80 text-xs uppercase tracking-widest text-electric-cyan">
+                  </>
+                ) : (
+                  <div className="space-y-5">
+                    <div className="glass-panel flex flex-col gap-4 p-5 lg:flex-row lg:items-center lg:justify-between">
+                      <div>
+                        <h4 className="text-xl font-bold text-white">EASA-KPI</h4>
+                        <p className="mt-1 text-sm text-slate-400">Imported from the Excel tab "EASA KPI Copy Ready". All columns are editable and saved locally.</p>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-3">
+                        {kpiLastSaved && <span className="text-xs text-slate-400">{kpiLastSaved}</span>}
+                        <button type="button" onClick={handleSaveKpiRows} className="btn-primary inline-flex items-center gap-2">
+                          <Save className="h-4 w-4" aria-hidden="true" />
+                          Save KPI
+                        </button>
+                        <button type="button" onClick={handleResetKpiRows} className="btn-secondary">
+                          Reset Excel Data
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="overflow-x-auto rounded-xl border border-electric-cyan/15 bg-navy-900/45 shadow-2xl shadow-black/20">
+                      <table className="min-w-[1800px] w-full border-collapse text-left">
+                        <thead className="bg-navy-800/90 text-xs uppercase tracking-widest text-electric-cyan">
                           <tr>
-                            <th className="px-4 py-3">Project</th>
-                            <th className="px-4 py-3">Status</th>
-                            <th className="px-4 py-3">Stakeholder</th>
-                            <th className="px-4 py-3">Progress</th>
+                            <th className="w-14 px-4 py-4">No</th>
+                            {EASA_KPI_COLUMNS.map((column) => (
+                              <th key={column} className="min-w-56 px-4 py-4">{column}</th>
+                            ))}
+                            <th className="w-36 px-4 py-4">Action</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {visibleProjects.map((project) => {
-                            const update = getProjectUpdate(project);
-
-                            return (
-                              <tr key={project.title} className="border-t border-white/10 odd:bg-white/[0.025]">
-                                <td className="px-4 py-3 text-sm font-bold text-white">{project.title}</td>
-                                <td className="px-4 py-3 text-sm font-bold" style={{ color: `#${getStatusColor(update.status)}` }}>{update.status}</td>
-                                <td className="px-4 py-3 text-sm text-slate-300">{project.stakeholders}</td>
-                                <td className="px-4 py-3 text-sm text-slate-300">{compactSlideText(update.currentProgress, 110)}</td>
-                              </tr>
-                            );
-                          })}
+                          {kpiRows.map((row, rowIndex) => (
+                            <tr key={`kpi-row-${rowIndex}`} className="border-t border-white/10 align-top odd:bg-white/[0.025] hover:bg-electric-cyan/[0.035]">
+                              <td className="px-4 py-4 text-sm font-bold text-slate-400">{rowIndex + 1}</td>
+                              {EASA_KPI_COLUMNS.map((column) => (
+                                <td key={column} className="px-4 py-4">
+                                  <textarea
+                                    value={row[column] ?? ''}
+                                    onChange={(event) => handleKpiCellUpdate(rowIndex, column, event.target.value)}
+                                    className="min-h-36 w-full resize-y rounded-lg border border-white/10 bg-navy-900/80 p-3 text-sm leading-relaxed text-white outline-none transition placeholder:text-slate-500 focus:border-electric-cyan focus:ring-2 focus:ring-electric-cyan/25"
+                                    placeholder={column}
+                                  />
+                                </td>
+                              ))}
+                              <td className="px-4 py-4">
+                                <button
+                                  type="button"
+                                  onClick={() => setMaximizedKpiIndex(rowIndex)}
+                                  className="btn-secondary mb-2 inline-flex items-center gap-2 whitespace-nowrap"
+                                >
+                                  <Maximize2 className="h-4 w-4" aria-hidden="true" />
+                                  Maximize
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={handleSaveKpiRows}
+                                  className="btn-secondary inline-flex items-center gap-2 whitespace-nowrap"
+                                >
+                                  <Save className="h-4 w-4" aria-hidden="true" />
+                                  Save
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
                         </tbody>
                       </table>
                     </div>
+
+                    {maximizedKpiRow && maximizedKpiIndex !== null && (
+                      <div
+                        className="fixed inset-y-0 left-0 right-0 z-50 flex items-center justify-center bg-navy-950/85 p-4 backdrop-blur-md md:left-64"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="maximized-kpi-title"
+                      >
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.96, y: 16 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="flex max-h-[92vh] w-full max-w-7xl flex-col overflow-hidden rounded-2xl border border-electric-cyan/30 bg-navy-900 shadow-2xl shadow-electric-cyan/10"
+                        >
+                          <div className="flex flex-col gap-4 border-b border-white/10 bg-navy-800/95 p-5 lg:flex-row lg:items-start lg:justify-between">
+                            <div>
+                              <div className="mb-2 text-xs font-bold uppercase tracking-[0.25em] text-electric-cyan">Maximized EASA-KPI View</div>
+                              <h3 id="maximized-kpi-title" className="text-3xl font-black leading-tight text-white lg:text-4xl">
+                                KPI {maximizedKpiIndex + 1}
+                              </h3>
+                              <p className="mt-2 text-base text-slate-300">All Excel KPI columns are editable in this full reading view.</p>
+                            </div>
+                            <div className="flex flex-wrap items-center gap-3">
+                              <button type="button" onClick={handleSaveKpiRows} className="btn-primary inline-flex items-center gap-2">
+                                <Save className="h-4 w-4" aria-hidden="true" />
+                                Save KPI
+                              </button>
+                              <button type="button" onClick={() => setMaximizedKpiIndex(null)} className="btn-secondary inline-flex items-center gap-2">
+                                <X className="h-4 w-4" aria-hidden="true" />
+                                Close
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="grid gap-5 overflow-y-auto p-5 lg:grid-cols-2">
+                            {EASA_KPI_COLUMNS.map((column) => (
+                              <div key={column}>
+                                <label htmlFor={`max-kpi-${maximizedKpiIndex}-${column}`} className="mb-2 block text-sm font-bold uppercase tracking-widest text-electric-cyan">
+                                  {column}
+                                </label>
+                                <textarea
+                                  id={`max-kpi-${maximizedKpiIndex}-${column}`}
+                                  value={maximizedKpiRow[column] ?? ''}
+                                  onChange={(event) => handleKpiCellUpdate(maximizedKpiIndex, column, event.target.value)}
+                                  className="min-h-52 w-full resize-y rounded-xl border border-white/10 bg-navy-950/80 p-5 text-xl leading-relaxed text-white outline-none transition placeholder:text-slate-500 focus:border-electric-cyan focus:ring-2 focus:ring-electric-cyan/25"
+                                  placeholder={column}
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        </motion.div>
+                      </div>
+                    )}
                   </div>
-                </div>
+                )}
               </div>
             )}
           </motion.div>
