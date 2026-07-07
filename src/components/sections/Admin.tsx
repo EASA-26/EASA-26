@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { Eye, EyeOff, FileDown, ImageIcon, Lock, LogOut, Save, ShieldCheck } from 'lucide-react';
+import { Eye, EyeOff, FileDown, ImageIcon, Lock, LogOut, Maximize2, Save, ShieldCheck, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { projectHistoryData } from '../../data/content';
 
@@ -80,11 +80,14 @@ export function Admin() {
   const [lastSaved, setLastSaved] = useState('');
   const [isExporting, setIsExporting] = useState(false);
   const [exportError, setExportError] = useState('');
+  const [maximizedProjectTitle, setMaximizedProjectTitle] = useState<string | null>(null);
 
   const projects = projectHistoryData.projects;
   const getProjectUpdate = (project: Project) => updates[project.title] ?? createDefaultUpdate(project);
   const visibleProjects = projects.filter((project) => getProjectUpdate(project).isVisible);
   const hiddenProjects = projects.filter((project) => !getProjectUpdate(project).isVisible);
+  const maximizedProject = projects.find((project) => project.title === maximizedProjectTitle);
+  const maximizedUpdate = maximizedProject ? getProjectUpdate(maximizedProject) : undefined;
 
   const handleUnlock = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -480,6 +483,14 @@ export function Admin() {
                         <td className="px-4 py-4">
                           <button
                             type="button"
+                            onClick={() => setMaximizedProjectTitle(project.title)}
+                            className="btn-secondary mb-2 inline-flex items-center gap-2 whitespace-nowrap"
+                          >
+                            <Maximize2 className="h-4 w-4" aria-hidden="true" />
+                            Maximize
+                          </button>
+                          <button
+                            type="button"
                             onClick={() => handleSave(project.title)}
                             className="btn-secondary mb-2 inline-flex items-center gap-2 whitespace-nowrap"
                           >
@@ -502,6 +513,133 @@ export function Admin() {
                 </tbody>
               </table>
             </div>
+
+            {maximizedProject && maximizedUpdate && (
+              <div
+                className="fixed inset-0 z-50 flex items-center justify-center bg-navy-950/85 p-4 backdrop-blur-md"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="maximized-project-title"
+              >
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.96, y: 16 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex max-h-[92vh] w-full max-w-7xl flex-col overflow-hidden rounded-2xl border border-electric-cyan/30 bg-navy-900 shadow-2xl shadow-electric-cyan/10"
+                >
+                  <div className="flex flex-col gap-4 border-b border-white/10 bg-navy-800/95 p-5 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                      <div className="mb-2 text-xs font-bold uppercase tracking-[0.25em] text-electric-cyan">Maximized Project View</div>
+                      <h3 id="maximized-project-title" className="text-3xl font-black leading-tight text-white lg:text-4xl">
+                        {maximizedProject.title}
+                      </h3>
+                      <p className="mt-2 text-base text-slate-300">Full management reading view with complete project wording.</p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <label className="sr-only" htmlFor={`max-status-${maximizedProject.title}`}>
+                        Status for {maximizedProject.title}
+                      </label>
+                      <select
+                        id={`max-status-${maximizedProject.title}`}
+                        value={maximizedUpdate.status}
+                        onChange={(event) => handleUpdate(maximizedProject.title, 'status', event.target.value as StatusOption)}
+                        className="rounded-lg border border-electric-cyan/25 bg-navy-950 px-4 py-3 text-sm font-bold text-electric-cyan outline-none transition focus:border-electric-cyan focus:ring-2 focus:ring-electric-cyan/25"
+                      >
+                        {STATUS_OPTIONS.map((status) => (
+                          <option key={status} value={status} className="bg-navy-900 text-white">
+                            {status}
+                          </option>
+                        ))}
+                      </select>
+                      <button type="button" onClick={() => handleSave(maximizedProject.title)} className="btn-primary inline-flex items-center gap-2">
+                        <Save className="h-4 w-4" aria-hidden="true" />
+                        Save
+                      </button>
+                      <button type="button" onClick={() => setMaximizedProjectTitle(null)} className="btn-secondary inline-flex items-center gap-2">
+                        <X className="h-4 w-4" aria-hidden="true" />
+                        Close
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="overflow-y-auto p-5 lg:p-7">
+                    <div className="grid gap-6 xl:grid-cols-[0.95fr_1.05fr]">
+                      <div className="space-y-5">
+                        {'image' in maximizedProject && maximizedProject.image ? (
+                          <div className="overflow-hidden rounded-xl border border-electric-cyan/25 bg-white shadow-[0_0_30px_rgba(37,216,255,0.18)]">
+                            <img
+                              src={`${import.meta.env.BASE_URL}${maximizedProject.image}`}
+                              alt={`${maximizedProject.title} user interface preview`}
+                              className="w-full object-cover object-top"
+                            />
+                          </div>
+                        ) : (
+                          <div className="flex aspect-video w-full items-center justify-center rounded-xl border border-white/10 bg-navy-800 text-slate-500">
+                            <ImageIcon className="h-10 w-10" aria-hidden="true" />
+                            <span className="sr-only">No UI preview available</span>
+                          </div>
+                        )}
+
+                        <div className="grid gap-4 sm:grid-cols-2">
+                          <div className="rounded-xl border border-white/10 bg-navy-800/70 p-4">
+                            <div className="mb-2 text-xs font-bold uppercase tracking-widest text-slate-500">Stakeholder</div>
+                            <p className="text-xl font-bold text-electric-cyan">{maximizedProject.stakeholders}</p>
+                          </div>
+                          <div className="rounded-xl border border-white/10 bg-navy-800/70 p-4">
+                            <div className="mb-2 text-xs font-bold uppercase tracking-widest text-slate-500">Status</div>
+                            <p className="text-xl font-bold" style={{ color: `#${getStatusColor(maximizedUpdate.status)}` }}>
+                              {maximizedUpdate.status}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-5">
+                        <div className="rounded-xl border border-white/10 bg-navy-800/70 p-5">
+                          <div className="mb-2 text-sm font-bold uppercase tracking-widest text-electric-cyan">Problem / Description</div>
+                          <p className="text-xl leading-relaxed text-white">{maximizedProject.problem}</p>
+                        </div>
+                        <div className="rounded-xl border border-white/10 bg-navy-800/70 p-5">
+                          <div className="mb-2 text-sm font-bold uppercase tracking-widest text-electric-cyan">AI Approach</div>
+                          <p className="text-xl leading-relaxed text-white">{maximizedProject.approach}</p>
+                        </div>
+                        <div className="rounded-xl border border-white/10 bg-navy-800/70 p-5">
+                          <div className="mb-2 text-sm font-bold uppercase tracking-widest text-accent-green">Value Delivered / Expected</div>
+                          <p className="text-xl leading-relaxed text-white">{maximizedProject.value}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 grid gap-5 lg:grid-cols-2">
+                      <div>
+                        <label htmlFor={`max-progress-${maximizedProject.title}`} className="mb-2 block text-sm font-bold uppercase tracking-widest text-electric-cyan">
+                          Current Progress
+                        </label>
+                        <textarea
+                          id={`max-progress-${maximizedProject.title}`}
+                          value={maximizedUpdate.currentProgress}
+                          onChange={(event) => handleUpdate(maximizedProject.title, 'currentProgress', event.target.value)}
+                          className="min-h-56 w-full resize-y rounded-xl border border-white/10 bg-navy-950/80 p-5 text-xl leading-relaxed text-white outline-none transition placeholder:text-slate-500 focus:border-electric-cyan focus:ring-2 focus:ring-electric-cyan/25"
+                          placeholder="Update current project progress"
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor={`max-way-forward-${maximizedProject.title}`} className="mb-2 block text-sm font-bold uppercase tracking-widest text-electric-cyan">
+                          Way Forward
+                        </label>
+                        <textarea
+                          id={`max-way-forward-${maximizedProject.title}`}
+                          value={maximizedUpdate.wayForward}
+                          onChange={(event) => handleUpdate(maximizedProject.title, 'wayForward', event.target.value)}
+                          className="min-h-56 w-full resize-y rounded-xl border border-white/10 bg-navy-950/80 p-5 text-xl leading-relaxed text-white outline-none transition placeholder:text-slate-500 focus:border-electric-cyan focus:ring-2 focus:ring-electric-cyan/25"
+                          placeholder="Add way forward, next action, target, or management decision"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            )}
           </motion.div>
         )}
       </div>
