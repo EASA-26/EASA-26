@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { Eye, EyeOff, FileDown, ImageIcon, Lock, LogOut, Maximize2, Save, ShieldCheck, X } from 'lucide-react';
+import { BarChart3, Eye, EyeOff, FileDown, ImageIcon, Lock, LogOut, Maximize2, Save, ShieldCheck, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { projectHistoryData } from '../../data/content';
 
@@ -21,6 +21,7 @@ type AdminProjectUpdate = {
 };
 
 type AdminProjectUpdates = Record<string, AdminProjectUpdate>;
+type AdminPage = 'project-update' | 'kpi';
 
 const createDefaultUpdate = (project: Project): AdminProjectUpdate => ({
   isVisible: true,
@@ -81,6 +82,7 @@ export function Admin() {
   const [isExporting, setIsExporting] = useState(false);
   const [exportError, setExportError] = useState('');
   const [maximizedProjectTitle, setMaximizedProjectTitle] = useState<string | null>(null);
+  const [activeAdminPage, setActiveAdminPage] = useState<AdminPage>('project-update');
 
   const projects = projectHistoryData.projects;
   const getProjectUpdate = (project: Project) => updates[project.title] ?? createDefaultUpdate(project);
@@ -88,6 +90,13 @@ export function Admin() {
   const hiddenProjects = projects.filter((project) => !getProjectUpdate(project).isVisible);
   const maximizedProject = projects.find((project) => project.title === maximizedProjectTitle);
   const maximizedUpdate = maximizedProject ? getProjectUpdate(maximizedProject) : undefined;
+  const statusSummary = STATUS_OPTIONS.map((status) => ({
+    status,
+    count: visibleProjects.filter((project) => getProjectUpdate(project).status === status).length,
+  }));
+  const deployedCount = statusSummary.find((item) => item.status === 'Deployed')?.count ?? 0;
+  const activeBuildCount = visibleProjects.filter((project) => ['Prototype', 'Pilot'].includes(getProjectUpdate(project).status)).length;
+  const plannedCount = statusSummary.find((item) => item.status === 'Planned')?.count ?? 0;
 
   const handleUnlock = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -335,6 +344,34 @@ export function Admin() {
             transition={{ duration: 0.5 }}
             className="mt-8"
           >
+            <div className="mb-6 inline-flex rounded-xl border border-electric-cyan/20 bg-navy-900/55 p-1 shadow-[0_0_24px_rgba(37,216,255,0.12)]">
+              {[
+                { id: 'project-update' as const, label: 'Project Update', icon: ShieldCheck },
+                { id: 'kpi' as const, label: 'KPI', icon: BarChart3 },
+              ].map((page) => {
+                const Icon = page.icon;
+                const isActive = activeAdminPage === page.id;
+
+                return (
+                  <button
+                    key={page.id}
+                    type="button"
+                    onClick={() => setActiveAdminPage(page.id)}
+                    className={`inline-flex items-center gap-2 rounded-lg px-5 py-3 text-sm font-bold transition ${
+                      isActive
+                        ? 'bg-electric-cyan/15 text-electric-cyan shadow-[0_0_18px_rgba(93,244,255,0.2)]'
+                        : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" aria-hidden="true" />
+                    {page.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {activeAdminPage === 'project-update' ? (
+              <>
             <div className="glass-panel mb-6 flex flex-col gap-4 p-5 lg:flex-row lg:items-center lg:justify-between">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-accent-green/30 bg-accent-green/10 text-accent-green">
@@ -516,7 +553,7 @@ export function Admin() {
 
             {maximizedProject && maximizedUpdate && (
               <div
-                className="fixed inset-0 z-50 flex items-center justify-center bg-navy-950/85 p-4 backdrop-blur-md"
+                className="fixed inset-y-0 left-0 right-0 z-50 flex items-center justify-center bg-navy-950/85 p-4 backdrop-blur-md md:left-64"
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="maximized-project-title"
@@ -638,6 +675,102 @@ export function Admin() {
                     </div>
                   </div>
                 </motion.div>
+              </div>
+            )}
+              </>
+            ) : (
+              <div className="space-y-6">
+                <div className="glass-panel p-6">
+                  <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+                    <div>
+                      <span className="text-xs font-bold uppercase tracking-[0.25em] text-electric-cyan">KPI Dashboard</span>
+                      <h3 className="mt-2 text-2xl font-black text-white">Management KPI Snapshot</h3>
+                      <p className="mt-2 text-sm text-slate-400">Current KPI view is calculated from visible projects in Admin.</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setActiveAdminPage('project-update')}
+                      className="btn-secondary inline-flex items-center gap-2"
+                    >
+                      <ShieldCheck className="h-4 w-4" aria-hidden="true" />
+                      Back to Project Update
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+                  {[
+                    { label: 'Visible Projects', value: visibleProjects.length, tone: 'text-white' },
+                    { label: 'Deployed', value: deployedCount, tone: 'text-accent-green' },
+                    { label: 'Pilot / Prototype', value: activeBuildCount, tone: 'text-electric-cyan' },
+                    { label: 'Planned', value: plannedCount, tone: 'text-sky-300' },
+                    { label: 'Hidden', value: hiddenProjects.length, tone: 'text-orange-300' },
+                  ].map((metric) => (
+                    <div key={metric.label} className="glass-card p-5">
+                      <div className={`text-4xl font-black ${metric.tone}`}>{metric.value}</div>
+                      <div className="mt-2 text-xs font-bold uppercase tracking-widest text-slate-400">{metric.label}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
+                  <div className="glass-card p-6">
+                    <h4 className="mb-5 text-lg font-bold text-white">Status Breakdown</h4>
+                    <div className="space-y-4">
+                      {statusSummary.map((item) => {
+                        const percentage = visibleProjects.length ? Math.round((item.count / visibleProjects.length) * 100) : 0;
+
+                        return (
+                          <div key={item.status}>
+                            <div className="mb-2 flex items-center justify-between text-sm">
+                              <span className="font-bold" style={{ color: `#${getStatusColor(item.status)}` }}>{item.status}</span>
+                              <span className="text-slate-300">{item.count} ({percentage}%)</span>
+                            </div>
+                            <div className="h-3 overflow-hidden rounded-full bg-navy-900/80">
+                              <div
+                                className="h-full rounded-full"
+                                style={{ width: `${percentage}%`, backgroundColor: `#${getStatusColor(item.status)}` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="glass-card overflow-hidden">
+                    <div className="border-b border-white/10 p-6">
+                      <h4 className="text-lg font-bold text-white">Visible Project KPI List</h4>
+                      <p className="mt-1 text-sm text-slate-400">Status and stakeholder view for management tracking.</p>
+                    </div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full min-w-[720px] border-collapse text-left">
+                        <thead className="bg-navy-800/80 text-xs uppercase tracking-widest text-electric-cyan">
+                          <tr>
+                            <th className="px-4 py-3">Project</th>
+                            <th className="px-4 py-3">Status</th>
+                            <th className="px-4 py-3">Stakeholder</th>
+                            <th className="px-4 py-3">Progress</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {visibleProjects.map((project) => {
+                            const update = getProjectUpdate(project);
+
+                            return (
+                              <tr key={project.title} className="border-t border-white/10 odd:bg-white/[0.025]">
+                                <td className="px-4 py-3 text-sm font-bold text-white">{project.title}</td>
+                                <td className="px-4 py-3 text-sm font-bold" style={{ color: `#${getStatusColor(update.status)}` }}>{update.status}</td>
+                                <td className="px-4 py-3 text-sm text-slate-300">{project.stakeholders}</td>
+                                <td className="px-4 py-3 text-sm text-slate-300">{compactSlideText(update.currentProgress, 110)}</td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </motion.div>
