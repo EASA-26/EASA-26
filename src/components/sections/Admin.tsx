@@ -7,7 +7,7 @@ import { projectHistoryData } from '../../data/content';
 const ADMIN_PASSWORD = 'easa26';
 const ADMIN_UNLOCK_KEY = 'easa-admin-unlocked';
 const ADMIN_STORAGE_KEY = 'easa-project-management-updates';
-const EASA_KPI_STORAGE_KEY = 'easa-kpi-management-updates';
+const EASA_KPI_STORAGE_KEY = 'easa-kpi-dd-management-updates';
 const STATUS_OPTIONS = ['Prototype', 'Deployed', 'Pilot', 'Planned'] as const;
 
 type Project = (typeof projectHistoryData.projects)[number];
@@ -27,41 +27,210 @@ type KpiPage = 'overview' | 'easa-kpi';
 type EasaKpiRow = Record<string, string>;
 
 const EASA_KPI_COLUMNS = [
+  'Scope',
+  'Category',
   'Strategic Objectives',
   'KPIs',
   'FY2026 Target',
-  '%',
-  'KPI Target Justifications - Col G',
-  '% - Col I',
-  'KPI Target Justifications - Col J',
-  '% - Col L',
-  'KPI Target Justifications - Col M',
+  'En Hilmi %',
+  'En Hilmi KPI Target Justifications',
+  'Chong Kah Luo %',
+  'Chong Kah Luo KPI Target Justifications',
+  'Mashitah %',
+  'Mashitah KPI Target Justifications',
 ] as const;
 
-const EASA_KPI_DEFAULT_ROWS: EasaKpiRow[] = [
-  {
-    'Strategic Objectives': 'KPI 1 : Enterprise AI Solution Delivery & Platform Cost Performance\n\nStatement: Deliver approved enterprise AI solution and AI data platform initiatives within approved timeline, scope, cost, cybersecurity, governance and quality requirements.',
-    KPIs: '[#/%] Enterprise AI Solution Delivery & Platform Cost Performance Index',
-    'FY2026 Target': 'BT: < 85%\nMT: 85% - 94%\nET: >= 95%',
-    '%': '15%',
-    'KPI Target Justifications - Col G': "Description: Measures EASA's ability to deliver approved enterprise AI solution and AI data platform initiatives with governance, quality, cybersecurity, timeline, scope and cost discipline.\n\nOutcome: Approved AI initiatives are delivered in a controlled, secure and governed manner with proper closure evidence.\n\nMeasurement = approved AI initiatives delivered as planned / total approved AI initiatives x 100",
-    '% - Col I': '15%',
-    'KPI Target Justifications - Col J': 'Initiatives:\nCompletion of:\n- Enterprise AI solution initiatives\n- AI data platform initiatives\n- Governance and cybersecurity readiness\n- Quality, documentation and closure evidence\n\nAdditional Involvement:',
-    '% - Col L': '15%',
-    'KPI Target Justifications - Col M': 'Initiatives:\nCompletion of:\n- Enterprise AI delivery roadmap\n- Cross-functional delivery coordination\n- AI platform readiness and adoption support\n- Project performance reporting and risk tracking\n\nAdditional Involvement:',
-  },
-  {
-    'Strategic Objectives': 'KPI 2 : AI Operational Value Creation & Databricks Cost Optimization\n\nStatement: Realize measurable value creation from deployed AI solutions and approved Databricks cost optimization through operational efficiency improvement, reliability improvement, AI adoption, cost saving or avoidance and EBIT uplift contribution.',
-    KPIs: '[RM] AI Operational Value Creation & Databricks Cost Optimization',
-    'FY2026 Target': 'BT: < RM3 million\nMT: RM3 million - RM5 million\nET: > RM5 million',
-    '%': '15%',
-    'KPI Target Justifications - Col G': 'Description: Measures verified financial and operational value from deployed AI initiatives, including operational improvement, cost avoidance, EBIT contribution and Databricks spend saving or avoidance. Databricks cost optimization is measured only under this KPI.\n\nOutcome: AI initiatives create measurable business value and platform cost efficiency, supported by validated benefit evidence.\n\nMeasurement = verified value creation from deployed AI solutions + verified Databricks cost saving / cost avoidance',
-    '% - Col I': '15%',
-    'KPI Target Justifications - Col J': 'Initiatives:\nCompletion of:\n- AI benefit realization tracking\n- Value creation validation\n- Databricks cost optimization actions\n- AI adoption and operational improvement reporting\n\nAdditional Involvement:',
-    '% - Col L': '15%',
-    'KPI Target Justifications - Col M': 'Initiatives:\nCompletion of:\n- Benefit validation with business owner / Finance\n- Cost saving or cost avoidance calculation\n- Databricks spend report and optimization evidence\n- EBIT uplift / operational value reporting\n\nAdditional Involvement:',
-  },
+const EASA_KPI_SOURCE_ROWS: string[][] = [
+  [
+    '',
+    'Financial',
+    'Improve profitability and returns',
+    '[RM] GENCO PAT ',
+    'LMT: RM305mn based on FY26 budget',
+    '15%',
+    '- KPI maintained from previous year to drive aspired Genco PAT target',
+    '15%',
+    '- KPI maintained from previous year to drive aspired Genco PAT target',
+    '15%',
+    '- KPI maintained from previous year to drive aspired Genco PAT target',
+  ],
+  [
+    '',
+    '',
+    'TED Unit in charge:',
+    '',
+    'UMT: RM350mn',
+    '',
+    "- LMT setting is based on Genco's FY2026 stretched budget with no provision for CP loss, TFV loss, demurrage and commercial variance (the budget was approved by GBOD)",
+    '',
+    "- LMT setting is based on Genco's FY2026 stretched budget with no provision for CP loss, TFV loss, demurrage and commercial variance (the budget was approved by GBOD)",
+    '',
+    "- LMT setting is based on Genco's FY2026 stretched budget with no provision for CP loss, TFV loss, demurrage and commercial variance (the budget was approved by GBOD)",
+  ],
+  ['', '', '[ESS]', '', 'Without MFRS-16', '', '- UMT setting is stretched target with additional RM50mn PAT', '', '- UMT setting is stretched target with additional RM50mn PAT', '', '- UMT setting is stretched target with additional RM50mn PAT'],
+  [
+    '',
+    'Customer',
+    'Achieve excellent generation availability & reliability ',
+    ' [%] Equivalent Unplanned Outage Factor, & Capacity Payment',
+    'LMT: 6.6%',
+    '15%',
+    '- KPI maintained from previous year on Equivalent Unplanned Outage Factor (EUOF). ',
+    '15%',
+    '- KPI maintained from previous year on Equivalent Unplanned Outage Factor (EUOF). ',
+    '15%',
+    '- KPI maintained from previous year on Equivalent Unplanned Outage Factor (EUOF). ',
+  ],
+  ['', '', 'TED Unit in charge:', '', 'UMT: 4.8% + Zero Capacity Payment Loss', '', '- LMT setting is based on weighted UOL 2 as per PPA / SLA', '', '- LMT setting is based on weighted UOL 2 as per PPA / SLA', '', '- LMT setting is based on weighted UOL 2 as per PPA / SLA'],
+  [
+    '',
+    '',
+    '[BBOP] Lead',
+    '',
+    '',
+    '',
+    '- UMT setting is based on weighted UOL 1 as per PPA / SLA, implementation of coal fineness, CP loss analytics which can contribute to achieving zero capacity payment.',
+    '',
+    '- UMT setting is based on weighted UOL 1 as per PPA / SLA, implementation of coal fineness, CP loss analytics which can contribute to achieving zero capacity payment.',
+    '',
+    '- UMT setting is based on weighted UOL 1 as per PPA / SLA, implementation of coal fineness, CP loss analytics which can contribute to achieving zero capacity payment.',
+  ],
+  ['', '', '[ST] Support', '', '', '', '', '', '', '', ''],
+  [
+    '',
+    '',
+    'Drive Engineering Services Excellence',
+    'a) [%] Completion of RFS/tasks/milestones within agreed time-frame and RCA (operation) with iCSI [10%]',
+    'LMT: 100% completion RFS (new development) & RFS and RCA (operation) ',
+    '15%',
+    'Completion of RFS : ',
+    '15%',
+    'Completion of RFS : ',
+    '15%',
+    'Completion of RFS : ',
+  ],
+  [
+    '',
+    '',
+    'TED Unit in charge:',
+    '',
+    'UMT: 100% completion RFS (new development) & RFS and RCA (operation) with iCSI > 90%',
+    '',
+    'LMT & UMT setting is based on completion of both RFS within time and achieving high customer satisfaction for the RFS tasks. Key attributes of this KPI:',
+    '',
+    'LMT & UMT setting is based on completion of both RFS within time and achieving high customer satisfaction for the RFS tasks. Key attributes of this KPI:',
+    '',
+    'LMT & UMT setting is based on completion of both RFS within time and achieving high customer satisfaction for the RFS tasks. Key attributes of this KPI:',
+  ],
+  ['', '', '[ED] Lead', '', '', '', '- New Development', '', '- New Development', '', '- New Development'],
+  ['', '', '[GT] Support', '', '', '', '1. New  solution for new technology request from others', '', '1. New  solution for new technology request from others', '', '1. New  solution for new technology request from others'],
+  ['', '', '', '', '', '', '2.Resolution of  engineering issues submitted to related department/stations within agreed time frame.', '', '2.Resolution of  engineering issues submitted to related department/stations within agreed time frame.', '', '2.Resolution of  engineering issues submitted to related department/stations within agreed time frame.'],
+  ['', '', '', '', '', '', '- Operation', '', '- Operation', '', '- Operation'],
+  ['', '', '', '', '', '', '1.Resolution of  engineering issues submitted to related department/stations within agreed time frame.', '', '1.Resolution of  engineering issues submitted to related department/stations within agreed time frame.', '', '1.Resolution of  engineering issues submitted to related department/stations within agreed time frame.'],
+  [
+    '',
+    '',
+    'Drive Engineering Services Excellence',
+    'b) [#] FFU / Ecosystem approved certifications by GTEC [5%]',
+    'LMT: Ecosystem:4 & Equipment:2 ',
+    '',
+    '- Technology platform for HLEP, HHFS, BESS, PHESS, Large Hydro and CCGT',
+    '',
+    '- Technology platform for HLEP, HHFS, BESS, PHESS, Large Hydro and CCGT',
+    '',
+    '- Technology platform for HLEP, HHFS, BESS, PHESS, Large Hydro and CCGT',
+  ],
+  [
+    '',
+    '',
+    'TED Unit in charge:',
+    '',
+    'UMT: Ecosystem:10 & Equipment:5',
+    '',
+    '- Ecosystem capability for hydro life-extension & integration TA, Solar design & grid integration TA, BESS safety & performance TA, PHES electro-mechanical TA, CCGT/ Large Hydro execution TA',
+    '',
+    '- Ecosystem capability for hydro life-extension & integration TA, Solar design & grid integration TA, BESS safety & performance TA, PHES electro-mechanical TA, CCGT/ Large Hydro execution TA',
+    '',
+    '- Ecosystem capability for hydro life-extension & integration TA, Solar design & grid integration TA, BESS safety & performance TA, PHES electro-mechanical TA, CCGT/ Large Hydro execution TA',
+  ],
+  ['', '', '[ST] Lead', '', '', '', '', '', '', '', ''],
+  ['', '', '[GT] Support', '', '', '', '', '', '', '', ''],
+  [
+    '',
+    'Internal Process',
+    'KPI 1 : Enterprise AI Solution Delivery & Platform Cost Performance\n\nStatement: Deliver approved enterprise AI solution and AI data platform initiatives within approved timeline, scope, cost, cybersecurity, governance and quality requirements.',
+    '[#/%] Enterprise AI Solution Delivery & Platform Cost Performance Index',
+    'BT: < 85%\nMT: 85% - 94%\nET: >= 95%',
+    '15%',
+    "Description: Measures EASA's ability to deliver approved enterprise AI solution and AI data platform initiatives with governance, quality, cybersecurity, timeline, scope and cost discipline.\n\nOutcome: Approved AI initiatives are delivered in a controlled, secure and governed manner with proper closure evidence.\n\nMeasurement = approved AI initiatives delivered as planned / total approved AI initiatives x 100",
+    '15%',
+    'Initiatives:\nCompletion of:\n- Enterprise AI solution initiatives\n- AI data platform initiatives\n- Governance and cybersecurity readiness\n- Quality, documentation and closure evidence\n\nAdditional Involvement:',
+    '15%',
+    'Initiatives:\nCompletion of:\n- Enterprise AI delivery roadmap\n- Cross-functional delivery coordination\n- AI platform readiness and adoption support\n- Project performance reporting and risk tracking\n\nAdditional Involvement:',
+  ],
+  [
+    '',
+    '',
+    'KPI 2 : AI Operational Value Creation & Databricks Cost Optimization\n\nStatement: Realize measurable value creation from deployed AI solutions and approved Databricks cost optimization through operational efficiency improvement, reliability improvement, AI adoption, cost saving or avoidance and EBIT uplift contribution.',
+    '[RM] AI Operational Value Creation & Databricks Cost Optimization',
+    'BT: < RM3 million\nMT: RM3 million - RM5 million\nET: > RM5 million',
+    '15%',
+    'Description: Measures verified financial and operational value from deployed AI initiatives, including operational improvement, cost avoidance, EBIT contribution and Databricks spend saving or avoidance. Databricks cost optimization is measured only under this KPI.\n\nOutcome: AI initiatives create measurable business value and platform cost efficiency, supported by validated benefit evidence.\n\nMeasurement = verified value creation from deployed AI solutions + verified Databricks cost saving / cost avoidance',
+    '15%',
+    'Initiatives:\nCompletion of:\n- AI benefit realization tracking\n- Value creation validation\n- Databricks cost optimization actions\n- AI adoption and operational improvement reporting\n\nAdditional Involvement:',
+    '15%',
+    'Initiatives:\nCompletion of:\n- Benefit validation with business owner / Finance\n- Cost saving or cost avoidance calculation\n- Databricks spend report and optimization evidence\n- EBIT uplift / operational value reporting\n\nAdditional Involvement:',
+  ],
+  [
+    '',
+    '',
+    'KPI 3 : Strengthen integrated digital delivery, governance and adoption across Genco Digital\n\nStatement :Ensure all sections jointly deliver roadmap initiatives through standard playbook, TNB ICT governance, cybersecurity-by-design, business adoption and sustainable handover.',
+    '#/%] Shared Digital Delivery, Governance & Customer Satisfaction Index (CSI)',
+    'LMT: 75%\nUMT: 85%',
+    '10%',
+    'Justification : Common KPI shared by all with identical statement, target, outcome and calculation to prevent silo delivery.\n\nOutcome :\nRoadmap initiatives are delivered cross-functionally, compliant with TNB ICT governance, secure before go-live, adopted by users and properly handed over.\n\nMeasurement = Roadmap delivery + Digital playbook compliance  + Cybersecurity incident + Project/Service delivery + CSI',
+    '10%',
+    'Justification : Common KPI shared by all with identical statement, target, outcome and calculation to prevent silo delivery.\n\nOutcome :\nRoadmap initiatives are delivered cross-functionally, compliant with TNB ICT governance, secure before go-live, adopted by users and properly handed over.\n\nMeasurement = Roadmap delivery + Digital playbook compliance  + Cybersecurity incident + Project/Service delivery + CSI',
+    '10%',
+    'Justification : Common KPI shared by all with identical statement, target, outcome and calculation to prevent silo delivery.\n\nOutcome :\nRoadmap initiatives are delivered cross-functionally, compliant with TNB ICT governance, secure before go-live, adopted by users and properly handed over.\n\nMeasurement = Roadmap delivery + Digital playbook compliance  + Cybersecurity incident + Project/Service delivery + CSI',
+  ],
+  [
+    'For TED HOUs & Staffs',
+    'Learning & Growth',
+    'Develop competent & Capable workforce',
+    '[#] Average number of contact hours per personnel (knowledge sharing/ training/courses) ',
+    'LMT: xx',
+    '5%',
+    '- This KPI ( HOUs and staff) is proposed to fill in the empty slot left by KPI [%] Ready Successor for CTEO',
+    '',
+    '',
+    '',
+    '',
+  ],
+  ['', '', '', 'or', 'UMT: xx', '', '', '', '', '', ''],
+  ['', '', '', '[#] Professional certifications', '', '', '', '', '', '', ''],
+  [
+    '',
+    '',
+    'Enhanced employee wellbeing and experience through strategic people transformation initiatives and Drive HSE excellence',
+    '[%] People Experience Score (PX) and [#] LTIF, Zero Fatality',
+    'LMT: PX 75% + 75% HSE Score',
+    '10%',
+    "- The additional requirements for achieving UMT for staff level is to manage risk of individual in department from totally riding on department's QPI achievement. ",
+    '',
+    '',
+    '',
+    '',
+  ],
+  ['', '', '', '', 'UMT: PX 85% + 90% HSE Score + QPI Reporting > 3 QPI', '', '', '', '', '', ''],
 ];
+
+const EASA_KPI_DEFAULT_ROWS: EasaKpiRow[] = EASA_KPI_SOURCE_ROWS.map((row) =>
+  EASA_KPI_COLUMNS.reduce<EasaKpiRow>((result, column, index) => {
+    result[column] = row[index] ?? '';
+    return result;
+  }, {}),
+);
 
 const createDefaultUpdate = (project: Project): AdminProjectUpdate => ({
   isVisible: true,
@@ -860,7 +1029,7 @@ export function Admin() {
                     <div>
                       <span className="text-xs font-bold uppercase tracking-[0.25em] text-electric-cyan">KPI Dashboard</span>
                       <h3 className="mt-2 text-2xl font-black text-white">Management KPI Workspace</h3>
-                      <p className="mt-2 text-sm text-slate-400">Use Overview for project KPI snapshot or EASA-KPI for the editable Excel KPI template.</p>
+                      <p className="mt-2 text-sm text-slate-400">Use Overview for project KPI snapshot or EASA-KPI for the editable D&D KPI workbook matrix.</p>
                     </div>
                     <button
                       type="button"
@@ -974,7 +1143,7 @@ export function Admin() {
                     <div className="glass-panel flex flex-col gap-4 p-5 lg:flex-row lg:items-center lg:justify-between">
                       <div>
                         <h4 className="text-xl font-bold text-white">EASA-KPI</h4>
-                        <p className="mt-1 text-sm text-slate-400">Imported from the Excel tab "EASA KPI Copy Ready". All columns are editable and saved locally.</p>
+                        <p className="mt-1 text-sm text-slate-400">Imported from "KPI D&D_EASA.xlsx", sheet "EASA- KPI". All columns are editable, saved locally, and available in maximized view.</p>
                       </div>
                       <div className="flex flex-wrap items-center gap-3">
                         {kpiLastSaved && <span className="text-xs text-slate-400">{kpiLastSaved}</span>}
@@ -989,7 +1158,7 @@ export function Admin() {
                     </div>
 
                     <div className="overflow-x-auto rounded-xl border border-electric-cyan/15 bg-navy-900/45 shadow-2xl shadow-black/20">
-                      <table className="min-w-[1800px] w-full border-collapse text-left">
+                      <table className="min-w-[2500px] w-full border-collapse text-left">
                         <thead className="bg-navy-800/90 text-xs uppercase tracking-widest text-electric-cyan">
                           <tr>
                             <th className="w-14 px-4 py-4">No</th>
