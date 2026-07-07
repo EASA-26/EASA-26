@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { ImageIcon, Lock, LogOut, Save, ShieldCheck } from 'lucide-react';
+import { FileDown, ImageIcon, Lock, LogOut, Save, ShieldCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { projectHistoryData } from '../../data/content';
 
@@ -26,6 +26,40 @@ const createDefaultUpdate = (project: Project): AdminProjectUpdate => ({
   currentProgress: `${project.status}: ${project.value}`,
   wayForward: '',
 });
+
+const getImageDataUri = async (image?: string) => {
+  if (!image) return '';
+
+  try {
+    const response = await fetch(`${import.meta.env.BASE_URL}${image}`);
+    const blob = await response.blob();
+
+    return await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result));
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return '';
+  }
+};
+
+const getStatusColor = (status: StatusOption) => {
+  switch (status) {
+    case 'Deployed':
+      return '34D399';
+    case 'Pilot':
+      return 'A78BFA';
+    case 'Planned':
+      return '38BDF8';
+    case 'Prototype':
+    default:
+      return 'FDBA74';
+  }
+};
+
+const formatSlideText = (value: string) => value.trim() || 'To be updated.';
 
 const loadSavedUpdates = (): AdminProjectUpdates => {
   try {
@@ -56,6 +90,8 @@ export function Admin() {
     }, {});
   });
   const [lastSaved, setLastSaved] = useState('');
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportError, setExportError] = useState('');
 
   const projects = projectHistoryData.projects;
 
@@ -114,6 +150,95 @@ export function Admin() {
     setUpdates(nextUpdates);
     saveUpdates(nextUpdates);
     setLastSaved(savedAt);
+  };
+
+  const handleExportPowerPoint = async () => {
+    setIsExporting(true);
+    setExportError('');
+
+    try {
+      const { default: pptxgen } = await import('pptxgenjs');
+      const pptx = new pptxgen();
+      pptx.layout = 'LAYOUT_WIDE';
+      pptx.author = 'EASA';
+      pptx.company = 'TNB Genco';
+      pptx.subject = 'EASA project management updates';
+      pptx.title = 'EASA Project Management Updates';
+      pptx.theme = {
+        headFontFace: 'Aptos Display',
+        bodyFontFace: 'Aptos',
+      };
+
+      const generatedAt = new Date().toLocaleString('en-MY', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      });
+      const statusCounts = STATUS_OPTIONS.map((status) => ({
+        status,
+        count: projects.filter((project) => (updates[project.title] ?? createDefaultUpdate(project)).status === status).length,
+      }));
+
+      const cover = pptx.addSlide();
+      cover.background = { color: '071426' };
+      cover.addText('EASA', { x: 0.6, y: 0.35, w: 1.4, h: 0.35, fontFace: 'Aptos', fontSize: 16, bold: true, color: '66F6FF', margin: 0 });
+      cover.addText('Project Management Updates', { x: 0.6, y: 1.25, w: 8.4, h: 0.6, fontFace: 'Aptos Display', fontSize: 34, bold: true, color: 'FFFFFF', margin: 0 });
+      cover.addText('Prepared for management review', { x: 0.62, y: 1.95, w: 6.8, h: 0.35, fontSize: 15, color: 'A7B4C8', margin: 0 });
+      cover.addText(`Generated ${generatedAt}`, { x: 0.62, y: 6.75, w: 4.5, h: 0.25, fontSize: 10, color: '7DD3FC', margin: 0 });
+
+      cover.addText(String(projects.length), { x: 0.7, y: 3.05, w: 2.5, h: 0.5, fontSize: 30, bold: true, color: 'FFFFFF', margin: 0.08, fill: { color: '14375F' }, breakLine: false });
+      cover.addText('Projects in Admin List', { x: 0.72, y: 3.62, w: 2.45, h: 0.35, fontSize: 10, bold: true, color: '66F6FF', margin: 0.08, fill: { color: '14375F' } });
+
+      statusCounts.forEach(({ status, count }, index) => {
+        const x = 3.55 + index * 2.2;
+        cover.addText(String(count), { x, y: 3.05, w: 1.75, h: 0.5, fontSize: 28, bold: true, color: 'FFFFFF', margin: 0.08, fill: { color: '102E52' } });
+        cover.addText(status, { x, y: 3.62, w: 1.75, h: 0.35, fontSize: 10, bold: true, color: getStatusColor(status), margin: 0.08, fill: { color: '102E52' } });
+      });
+
+      cover.addText(
+        'This deck is generated from the editable Admin page. Status, current progress, and way forward fields reflect the latest saved or on-screen values in the browser.',
+        { x: 0.65, y: 4.75, w: 11.9, h: 0.75, fontSize: 13, color: 'D8E2F0', margin: 0.1, breakLine: false },
+      );
+
+      for (const [index, project] of projects.entries()) {
+        const update = updates[project.title] ?? createDefaultUpdate(project);
+        const imageData = await getImageDataUri('image' in project ? project.image : undefined);
+        const statusColor = getStatusColor(update.status);
+        const slide = pptx.addSlide();
+
+        slide.background = { color: '081529' };
+        slide.addText(`${index + 1}. ${project.title}`, { x: 0.45, y: 0.35, w: 7.5, h: 0.4, fontFace: 'Aptos Display', fontSize: 22, bold: true, color: 'FFFFFF', margin: 0 });
+        slide.addText(update.status, { x: 10.7, y: 0.35, w: 1.85, h: 0.35, fontSize: 11, bold: true, align: 'center', color: statusColor, margin: 0.05, fill: { color: '132B4A' }, breakLine: false });
+        slide.addText(`Stakeholder: ${project.stakeholders}`, { x: 0.48, y: 0.86, w: 4.5, h: 0.25, fontSize: 10.5, color: '66F6FF', margin: 0 });
+        slide.addText(formatSlideText(project.problem), { x: 0.48, y: 1.25, w: 5.85, h: 0.78, fontSize: 10, color: 'D5DEEA', margin: 0.04, breakLine: false, fit: 'shrink' });
+
+        if (imageData) {
+          slide.addImage({ data: imageData, x: 7, y: 1.05, w: 5.8, h: 3.26, sizing: { type: 'crop', x: 7, y: 1.05, w: 5.8, h: 3.26 } });
+        } else {
+          slide.addText('UI preview not available', { x: 7, y: 1.05, w: 5.8, h: 3.26, fontSize: 18, bold: true, align: 'center', valign: 'middle', color: '64748B', margin: 0.1, fill: { color: '132033' } });
+        }
+
+        slide.addText('Value Summary', { x: 0.48, y: 2.28, w: 5.85, h: 0.25, fontSize: 10, bold: true, color: '66F6FF', margin: 0 });
+        slide.addText(formatSlideText(project.value), { x: 0.48, y: 2.62, w: 5.85, h: 1.15, fontSize: 10, color: 'D5DEEA', margin: 0.08, fill: { color: '10233D' }, breakLine: false, fit: 'shrink' });
+
+        slide.addText('Current Progress', { x: 0.48, y: 4.45, w: 5.95, h: 0.28, fontSize: 11, bold: true, color: '66F6FF', margin: 0 });
+        slide.addText(formatSlideText(update.currentProgress), { x: 0.48, y: 4.83, w: 5.95, h: 1.42, fontSize: 10, color: 'F8FAFC', margin: 0.1, fill: { color: '10233D' }, breakLine: false, fit: 'shrink' });
+
+        slide.addText('Way Forward', { x: 6.75, y: 4.45, w: 6.05, h: 0.28, fontSize: 11, bold: true, color: '66F6FF', margin: 0 });
+        slide.addText(formatSlideText(update.wayForward), { x: 6.75, y: 4.83, w: 6.05, h: 1.42, fontSize: 10, color: 'F8FAFC', margin: 0.1, fill: { color: '10233D' }, breakLine: false, fit: 'shrink' });
+
+        slide.addText('Enterprise AI Solution Architect | TNB Genco', { x: 0.5, y: 6.86, w: 5, h: 0.2, fontSize: 8, color: '7DD3FC', margin: 0 });
+        slide.addText(`${index + 2}`, { x: 12.25, y: 6.86, w: 0.5, h: 0.2, fontSize: 8, color: '7DD3FC', align: 'right', margin: 0 });
+      }
+
+      await pptx.writeFile({
+        fileName: `EASA-project-management-updates-${new Date().toISOString().slice(0, 10)}.pptx`,
+        compression: true,
+      });
+    } catch {
+      setExportError('PowerPoint export failed. Please try again.');
+    } finally {
+      setIsExporting(false);
+    }
   };
 
   const handleLogout = () => {
@@ -195,12 +320,22 @@ export function Admin() {
                   <Save className="h-4 w-4" aria-hidden="true" />
                   Save All
                 </button>
+                <button
+                  type="button"
+                  onClick={handleExportPowerPoint}
+                  disabled={isExporting}
+                  className="btn-primary inline-flex items-center gap-2 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <FileDown className="h-4 w-4" aria-hidden="true" />
+                  {isExporting ? 'Preparing...' : 'Export PPT'}
+                </button>
                 <button type="button" onClick={handleLogout} className="btn-secondary inline-flex items-center gap-2">
                   <LogOut className="h-4 w-4" aria-hidden="true" />
                   Log Out
                 </button>
               </div>
             </div>
+            {exportError && <p className="mb-4 text-sm font-medium text-orange-300">{exportError}</p>}
 
             <div className="overflow-x-auto rounded-xl border border-electric-cyan/15 bg-navy-900/45 shadow-2xl shadow-black/20">
               <table className="min-w-[1320px] w-full border-collapse text-left">
