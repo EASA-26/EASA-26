@@ -7,7 +7,7 @@ import { projectHistoryData } from '../../data/content';
 const ADMIN_PASSWORD = 'easa26';
 const ADMIN_UNLOCK_KEY = 'easa-admin-unlocked';
 const ADMIN_STORAGE_KEY = 'easa-project-management-updates';
-const EASA_KPI_STORAGE_KEY = 'easa-kpi-dd-management-updates';
+const EASA_KPI_STORAGE_KEY = 'easa-kpi-internal-process-updates';
 const STATUS_OPTIONS = ['Prototype', 'Deployed', 'Pilot', 'Planned'] as const;
 
 type Project = (typeof projectHistoryData.projects)[number];
@@ -225,7 +225,11 @@ const EASA_KPI_SOURCE_ROWS: string[][] = [
   ['', '', '', '', 'UMT: PX 85% + 90% HSE Score + QPI Reporting > 3 QPI', '', '', '', '', '', ''],
 ];
 
-const EASA_KPI_DEFAULT_ROWS: EasaKpiRow[] = EASA_KPI_SOURCE_ROWS.map((row) =>
+const EASA_KPI_INTERNAL_PROCESS_ROWS = EASA_KPI_SOURCE_ROWS.filter((row) =>
+  row[1] === 'Internal Process' || row[2].startsWith('KPI 2 :') || row[2].startsWith('KPI 3 :'),
+);
+
+const EASA_KPI_DEFAULT_ROWS: EasaKpiRow[] = EASA_KPI_INTERNAL_PROCESS_ROWS.map((row) =>
   EASA_KPI_COLUMNS.reduce<EasaKpiRow>((result, column, index) => {
     result[column] = row[index] ?? '';
     return result;
@@ -1029,7 +1033,7 @@ export function Admin() {
                     <div>
                       <span className="text-xs font-bold uppercase tracking-[0.25em] text-electric-cyan">KPI Dashboard</span>
                       <h3 className="mt-2 text-2xl font-black text-white">Management KPI Workspace</h3>
-                      <p className="mt-2 text-sm text-slate-400">Use Overview for project KPI snapshot or EASA-KPI for the editable D&D KPI workbook matrix.</p>
+                      <p className="mt-2 text-sm text-slate-400">Use Overview for project KPI snapshot or EASA-KPI for the editable Internal Process KPI matrix.</p>
                     </div>
                     <button
                       type="button"
@@ -1143,7 +1147,7 @@ export function Admin() {
                     <div className="glass-panel flex flex-col gap-4 p-5 lg:flex-row lg:items-center lg:justify-between">
                       <div>
                         <h4 className="text-xl font-bold text-white">EASA-KPI</h4>
-                        <p className="mt-1 text-sm text-slate-400">Imported from "KPI D&D_EASA.xlsx", sheet "EASA- KPI". All columns are editable, saved locally, and available in maximized view.</p>
+                        <p className="mt-1 text-sm text-slate-400">Internal Process KPIs only, based on "KPI D&D_EASA.xlsx". All columns are editable, saved locally, and available in maximized view.</p>
                       </div>
                       <div className="flex flex-wrap items-center gap-3">
                         {kpiLastSaved && <span className="text-xs text-slate-400">{kpiLastSaved}</span>}
