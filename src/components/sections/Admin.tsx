@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { Lock, Save, ShieldCheck } from 'lucide-react';
+import { ImageIcon, Lock, LogOut, Save, ShieldCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { projectHistoryData } from '../../data/content';
 
@@ -105,9 +105,11 @@ export function Admin() {
     setLastSaved(savedAt);
   };
 
-  const handleLock = () => {
+  const handleLogout = () => {
     sessionStorage.removeItem(ADMIN_UNLOCK_KEY);
     setIsUnlocked(false);
+    setPassword('');
+    setError('');
   };
 
   return (
@@ -182,18 +184,20 @@ export function Admin() {
                   <Save className="h-4 w-4" aria-hidden="true" />
                   Save All
                 </button>
-                <button type="button" onClick={handleLock} className="btn-secondary">
-                  Lock
+                <button type="button" onClick={handleLogout} className="btn-secondary inline-flex items-center gap-2">
+                  <LogOut className="h-4 w-4" aria-hidden="true" />
+                  Log Out
                 </button>
               </div>
             </div>
 
             <div className="overflow-x-auto rounded-xl border border-electric-cyan/15 bg-navy-900/45 shadow-2xl shadow-black/20">
-              <table className="min-w-[1200px] w-full border-collapse text-left">
+              <table className="min-w-[1480px] w-full border-collapse text-left">
                 <thead className="bg-navy-800/90 text-xs uppercase tracking-widest text-electric-cyan">
                   <tr>
                     <th className="w-12 px-4 py-4">No</th>
                     <th className="w-56 px-4 py-4">Project</th>
+                    <th className="w-64 px-4 py-4">UI Preview</th>
                     <th className="w-32 px-4 py-4">Status</th>
                     <th className="w-36 px-4 py-4">Stakeholder</th>
                     <th className="w-80 px-4 py-4">Value Summary</th>
@@ -212,6 +216,22 @@ export function Admin() {
                         <td className="px-4 py-4">
                           <div className="font-bold text-white">{project.title}</div>
                           <div className="mt-1 line-clamp-3 text-xs leading-relaxed text-slate-400">{project.problem}</div>
+                        </td>
+                        <td className="px-4 py-4">
+                          {'image' in project && project.image ? (
+                            <div className="overflow-hidden rounded-lg border border-electric-cyan/20 bg-white/95 shadow-[0_0_18px_rgba(37,216,255,0.12)]">
+                              <img
+                                src={`${import.meta.env.BASE_URL}${project.image}`}
+                                alt={`${project.title} user interface preview`}
+                                className="aspect-video w-full object-cover object-top"
+                              />
+                            </div>
+                          ) : (
+                            <div className="flex aspect-video w-full items-center justify-center rounded-lg border border-white/10 bg-navy-800/70 text-slate-500">
+                              <ImageIcon className="h-6 w-6" aria-hidden="true" />
+                              <span className="sr-only">No UI preview available</span>
+                            </div>
+                          )}
                         </td>
                         <td className="px-4 py-4">
                           <span className="inline-flex rounded-full border border-electric-cyan/25 bg-electric-cyan/10 px-2.5 py-1 text-xs font-bold text-electric-cyan">
