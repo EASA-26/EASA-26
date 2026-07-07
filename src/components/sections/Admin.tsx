@@ -29,24 +29,6 @@ const createDefaultUpdate = (project: Project): AdminProjectUpdate => ({
   wayForward: '',
 });
 
-const getImageDataUri = async (image?: string) => {
-  if (!image) return '';
-
-  try {
-    const response = await fetch(`${import.meta.env.BASE_URL}${image}`);
-    const blob = await response.blob();
-
-    return await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result));
-      reader.onerror = () => reject(reader.error);
-      reader.readAsDataURL(blob);
-    });
-  } catch {
-    return '';
-  }
-};
-
 const getStatusColor = (status: StatusOption) => {
   switch (status) {
     case 'Deployed':
@@ -62,6 +44,10 @@ const getStatusColor = (status: StatusOption) => {
 };
 
 const formatSlideText = (value: string) => value.trim() || 'To be updated.';
+const compactSlideText = (value: string, maxLength = 210) => {
+  const cleanValue = formatSlideText(value).replace(/\s+/g, ' ');
+  return cleanValue.length > maxLength ? `${cleanValue.slice(0, maxLength - 1)}...` : cleanValue;
+};
 
 const loadSavedUpdates = (): AdminProjectUpdates => {
   try {
@@ -203,58 +189,74 @@ export function Admin() {
         status,
         count: visibleProjects.filter((project) => (updates[project.title] ?? createDefaultUpdate(project)).status === status).length,
       }));
+      const splitIndex = Math.ceil(visibleProjects.length / 2);
+      const slideGroups = [
+        visibleProjects.slice(0, splitIndex),
+        visibleProjects.slice(splitIndex),
+      ];
+      const columnLayout = [
+        { label: 'No', x: 0.35, w: 0.35 },
+        { label: 'Project', x: 0.75, w: 1.45 },
+        { label: 'Status', x: 2.25, w: 0.82 },
+        { label: 'Stakeholder', x: 3.12, w: 0.88 },
+        { label: 'Summary / Value', x: 4.05, w: 3.05 },
+        { label: 'Current Progress', x: 7.15, w: 2.85 },
+        { label: 'Way Forward', x: 10.05, w: 2.9 },
+      ];
 
-      const cover = pptx.addSlide();
-      cover.background = { color: '071426' };
-      cover.addText('EASA', { x: 0.6, y: 0.35, w: 1.4, h: 0.35, fontFace: 'Aptos', fontSize: 16, bold: true, color: '66F6FF', margin: 0 });
-      cover.addText('Project Management Updates', { x: 0.6, y: 1.25, w: 8.4, h: 0.6, fontFace: 'Aptos Display', fontSize: 34, bold: true, color: 'FFFFFF', margin: 0 });
-      cover.addText('Prepared for management review', { x: 0.62, y: 1.95, w: 6.8, h: 0.35, fontSize: 15, color: 'A7B4C8', margin: 0 });
-      cover.addText(`Generated ${generatedAt}`, { x: 0.62, y: 6.75, w: 4.5, h: 0.25, fontSize: 10, color: '7DD3FC', margin: 0 });
-
-      cover.addText(String(visibleProjects.length), { x: 0.7, y: 3.05, w: 2.5, h: 0.5, fontSize: 30, bold: true, color: 'FFFFFF', margin: 0.08, fill: { color: '14375F' }, breakLine: false });
-      cover.addText('Visible Projects', { x: 0.72, y: 3.62, w: 2.45, h: 0.35, fontSize: 10, bold: true, color: '66F6FF', margin: 0.08, fill: { color: '14375F' } });
-
-      statusCounts.forEach(({ status, count }, index) => {
-        const x = 3.55 + index * 2.2;
-        cover.addText(String(count), { x, y: 3.05, w: 1.75, h: 0.5, fontSize: 28, bold: true, color: 'FFFFFF', margin: 0.08, fill: { color: '102E52' } });
-        cover.addText(status, { x, y: 3.62, w: 1.75, h: 0.35, fontSize: 10, bold: true, color: getStatusColor(status), margin: 0.08, fill: { color: '102E52' } });
-      });
-
-      cover.addText(
-        'This deck is generated from visible projects in the editable Admin page. Hidden projects are excluded from the management export.',
-        { x: 0.65, y: 4.75, w: 11.9, h: 0.75, fontSize: 13, color: 'D8E2F0', margin: 0.1, breakLine: false },
-      );
-
-      for (const [index, project] of visibleProjects.entries()) {
-        const update = updates[project.title] ?? createDefaultUpdate(project);
-        const imageData = await getImageDataUri('image' in project ? project.image : undefined);
-        const statusColor = getStatusColor(update.status);
+      slideGroups.forEach((group, slideIndex) => {
         const slide = pptx.addSlide();
+        const rowHeight = Math.min(0.82, 5.05 / Math.max(group.length, 1));
 
-        slide.background = { color: '081529' };
-        slide.addText(`${index + 1}. ${project.title}`, { x: 0.45, y: 0.35, w: 7.5, h: 0.4, fontFace: 'Aptos Display', fontSize: 22, bold: true, color: 'FFFFFF', margin: 0 });
-        slide.addText(update.status, { x: 10.7, y: 0.35, w: 1.85, h: 0.35, fontSize: 11, bold: true, align: 'center', color: statusColor, margin: 0.05, fill: { color: '132B4A' }, breakLine: false });
-        slide.addText(`Stakeholder: ${project.stakeholders}`, { x: 0.48, y: 0.86, w: 4.5, h: 0.25, fontSize: 10.5, color: '66F6FF', margin: 0 });
-        slide.addText(formatSlideText(project.problem), { x: 0.48, y: 1.25, w: 5.85, h: 0.78, fontSize: 10, color: 'D5DEEA', margin: 0.04, breakLine: false, fit: 'shrink' });
+        slide.background = { color: '071426' };
+        slide.addText('EASA Project Management Updates', { x: 0.35, y: 0.28, w: 6.8, h: 0.34, fontFace: 'Aptos Display', fontSize: 18, bold: true, color: 'FFFFFF', margin: 0 });
+        slide.addText(`Compressed management view ${slideIndex + 1} / 2`, { x: 0.36, y: 0.68, w: 3.8, h: 0.22, fontSize: 8.5, color: '66F6FF', margin: 0 });
+        slide.addText(`Generated ${generatedAt}`, { x: 9.45, y: 0.3, w: 3.5, h: 0.2, fontSize: 8, color: 'A7B4C8', align: 'right', margin: 0 });
 
-        if (imageData) {
-          slide.addImage({ data: imageData, x: 7, y: 1.05, w: 5.8, h: 3.26, sizing: { type: 'crop', x: 7, y: 1.05, w: 5.8, h: 3.26 } });
-        } else {
-          slide.addText('UI preview not available', { x: 7, y: 1.05, w: 5.8, h: 3.26, fontSize: 18, bold: true, align: 'center', valign: 'middle', color: '64748B', margin: 0.1, fill: { color: '132033' } });
+        slide.addText(String(visibleProjects.length), { x: 0.35, y: 1.02, w: 1.05, h: 0.35, fontSize: 15, bold: true, color: 'FFFFFF', align: 'center', margin: 0.04, fill: { color: '14375F' }, breakLine: false });
+        slide.addText('VISIBLE', { x: 0.35, y: 1.38, w: 1.05, h: 0.18, fontSize: 5.8, bold: true, color: '66F6FF', align: 'center', margin: 0.02, fill: { color: '14375F' } });
+
+        statusCounts.forEach(({ status, count }, index) => {
+          const x = 1.55 + index * 1.12;
+          slide.addText(String(count), { x, y: 1.02, w: 0.9, h: 0.35, fontSize: 14, bold: true, color: 'FFFFFF', align: 'center', margin: 0.04, fill: { color: '102E52' }, breakLine: false });
+          slide.addText(status.toUpperCase(), { x, y: 1.38, w: 0.9, h: 0.18, fontSize: 5.3, bold: true, color: getStatusColor(status), align: 'center', margin: 0.02, fill: { color: '102E52' } });
+        });
+
+        slide.addText(
+          'Hidden projects are excluded. Rows contain compressed project summary, value, current progress, and way forward from the Admin page.',
+          { x: 6.25, y: 1.08, w: 6.7, h: 0.36, fontSize: 7.5, color: 'D8E2F0', margin: 0.04, breakLine: false, fit: 'shrink' },
+        );
+
+        columnLayout.forEach((column) => {
+          slide.addText(column.label, { x: column.x, y: 1.78, w: column.w, h: 0.22, fontSize: 6.5, bold: true, color: '66F6FF', margin: 0.02, fill: { color: '10233D' } });
+        });
+
+        if (group.length === 0) {
+          slide.addText('No projects in this section.', { x: 0.35, y: 2.25, w: 12.6, h: 3, fontSize: 16, bold: true, color: '64748B', align: 'center', valign: 'middle', margin: 0.1, fill: { color: '10233D' } });
         }
 
-        slide.addText('Value Summary', { x: 0.48, y: 2.28, w: 5.85, h: 0.25, fontSize: 10, bold: true, color: '66F6FF', margin: 0 });
-        slide.addText(formatSlideText(project.value), { x: 0.48, y: 2.62, w: 5.85, h: 1.15, fontSize: 10, color: 'D5DEEA', margin: 0.08, fill: { color: '10233D' }, breakLine: false, fit: 'shrink' });
+        group.forEach((project, rowIndex) => {
+          const update = updates[project.title] ?? createDefaultUpdate(project);
+          const y = 2.05 + rowIndex * rowHeight;
+          const fillColor = rowIndex % 2 === 0 ? '0D213A' : '102945';
+          const summary = `${project.problem} Value: ${project.value}`;
 
-        slide.addText('Current Progress', { x: 0.48, y: 4.45, w: 5.95, h: 0.28, fontSize: 11, bold: true, color: '66F6FF', margin: 0 });
-        slide.addText(formatSlideText(update.currentProgress), { x: 0.48, y: 4.83, w: 5.95, h: 1.42, fontSize: 10, color: 'F8FAFC', margin: 0.1, fill: { color: '10233D' }, breakLine: false, fit: 'shrink' });
+          columnLayout.forEach((column) => {
+            slide.addText('', { x: column.x, y, w: column.w, h: rowHeight - 0.03, fill: { color: fillColor }, margin: 0.01 });
+          });
 
-        slide.addText('Way Forward', { x: 6.75, y: 4.45, w: 6.05, h: 0.28, fontSize: 11, bold: true, color: '66F6FF', margin: 0 });
-        slide.addText(formatSlideText(update.wayForward), { x: 6.75, y: 4.83, w: 6.05, h: 1.42, fontSize: 10, color: 'F8FAFC', margin: 0.1, fill: { color: '10233D' }, breakLine: false, fit: 'shrink' });
+          slide.addText(String(slideIndex * splitIndex + rowIndex + 1), { x: 0.35, y: y + 0.03, w: 0.35, h: rowHeight - 0.08, fontSize: 5.7, bold: true, color: 'A7B4C8', align: 'center', margin: 0.02, fit: 'shrink' });
+          slide.addText(compactSlideText(project.title, 42), { x: 0.75, y: y + 0.03, w: 1.45, h: rowHeight - 0.08, fontSize: 5.9, bold: true, color: 'FFFFFF', margin: 0.03, fit: 'shrink' });
+          slide.addText(update.status, { x: 2.25, y: y + 0.03, w: 0.82, h: rowHeight - 0.08, fontSize: 5.5, bold: true, color: getStatusColor(update.status), align: 'center', margin: 0.02, fit: 'shrink' });
+          slide.addText(compactSlideText(project.stakeholders, 28), { x: 3.12, y: y + 0.03, w: 0.88, h: rowHeight - 0.08, fontSize: 5.4, color: 'D5DEEA', margin: 0.03, fit: 'shrink' });
+          slide.addText(compactSlideText(summary, 260), { x: 4.05, y: y + 0.03, w: 3.05, h: rowHeight - 0.08, fontSize: 5.15, color: 'D5DEEA', margin: 0.04, breakLine: false, fit: 'shrink' });
+          slide.addText(compactSlideText(update.currentProgress, 230), { x: 7.15, y: y + 0.03, w: 2.85, h: rowHeight - 0.08, fontSize: 5.15, color: 'F8FAFC', margin: 0.04, breakLine: false, fit: 'shrink' });
+          slide.addText(compactSlideText(update.wayForward, 230), { x: 10.05, y: y + 0.03, w: 2.9, h: rowHeight - 0.08, fontSize: 5.15, color: 'F8FAFC', margin: 0.04, breakLine: false, fit: 'shrink' });
+        });
 
-        slide.addText('Enterprise AI Solution Architect | TNB Genco', { x: 0.5, y: 6.86, w: 5, h: 0.2, fontSize: 8, color: '7DD3FC', margin: 0 });
-        slide.addText(`${index + 2}`, { x: 12.25, y: 6.86, w: 0.5, h: 0.2, fontSize: 8, color: '7DD3FC', align: 'right', margin: 0 });
-      }
+        slide.addText('Enterprise AI Solution Architect | TNB Genco', { x: 0.35, y: 7.06, w: 5, h: 0.16, fontSize: 7, color: '7DD3FC', margin: 0 });
+        slide.addText(`${slideIndex + 1} / 2`, { x: 12.3, y: 7.06, w: 0.65, h: 0.16, fontSize: 7, color: '7DD3FC', align: 'right', margin: 0 });
+      });
 
       await pptx.writeFile({
         fileName: `EASA-project-management-updates-${new Date().toISOString().slice(0, 10)}.pptx`,
