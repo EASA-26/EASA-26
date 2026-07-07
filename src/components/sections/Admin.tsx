@@ -7,7 +7,7 @@ import { projectHistoryData } from '../../data/content';
 const ADMIN_PASSWORD = 'easa26';
 const ADMIN_UNLOCK_KEY = 'easa-admin-unlocked';
 const ADMIN_STORAGE_KEY = 'easa-project-management-updates';
-const EASA_KPI_STORAGE_KEY = 'easa-kpi-internal-process-updates';
+const EASA_KPI_STORAGE_KEY = 'easa-kpi-internal-process-neutral-headers';
 const STATUS_OPTIONS = ['Prototype', 'Deployed', 'Pilot', 'Planned'] as const;
 
 type Project = (typeof projectHistoryData.projects)[number];
@@ -32,12 +32,12 @@ const EASA_KPI_COLUMNS = [
   'Strategic Objectives',
   'KPIs',
   'FY2026 Target',
-  'En Hilmi %',
-  'En Hilmi KPI Target Justifications',
-  'Chong Kah Luo %',
-  'Chong Kah Luo KPI Target Justifications',
-  'Mashitah %',
-  'Mashitah KPI Target Justifications',
+  'Weight 1',
+  'KPI Target Justifications 1',
+  'Weight 2',
+  'KPI Target Justifications 2',
+  'Weight 3',
+  'KPI Target Justifications 3',
 ] as const;
 
 const EASA_KPI_SOURCE_ROWS: string[][] = [
