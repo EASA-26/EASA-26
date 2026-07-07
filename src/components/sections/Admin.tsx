@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { FileDown, ImageIcon, Lock, LogOut, Save, ShieldCheck } from 'lucide-react';
+import { Eye, EyeOff, FileDown, ImageIcon, Lock, LogOut, Save, ShieldCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { projectHistoryData } from '../../data/content';
 
@@ -13,6 +13,7 @@ type Project = (typeof projectHistoryData.projects)[number];
 type StatusOption = (typeof STATUS_OPTIONS)[number];
 
 type AdminProjectUpdate = {
+  isVisible: boolean;
   status: StatusOption;
   currentProgress: string;
   wayForward: string;
@@ -22,6 +23,7 @@ type AdminProjectUpdate = {
 type AdminProjectUpdates = Record<string, AdminProjectUpdate>;
 
 const createDefaultUpdate = (project: Project): AdminProjectUpdate => ({
+  isVisible: true,
   status: STATUS_OPTIONS.includes(project.status as StatusOption) ? project.status as StatusOption : 'Prototype',
   currentProgress: `${project.status}: ${project.value}`,
   wayForward: '',
@@ -94,6 +96,9 @@ export function Admin() {
   const [exportError, setExportError] = useState('');
 
   const projects = projectHistoryData.projects;
+  const getProjectUpdate = (project: Project) => updates[project.title] ?? createDefaultUpdate(project);
+  const visibleProjects = projects.filter((project) => getProjectUpdate(project).isVisible);
+  const hiddenProjects = projects.filter((project) => !getProjectUpdate(project).isVisible);
 
   const handleUnlock = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -121,6 +126,27 @@ export function Admin() {
         [field]: value,
       },
     }));
+  };
+
+  const handleVisibilityChange = (projectTitle: string, isVisible: boolean) => {
+    const project = projects.find((item) => item.title === projectTitle) ?? projects[0];
+    const savedAt = new Date().toLocaleString('en-MY', {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    });
+
+    const nextUpdates = {
+      ...updates,
+      [projectTitle]: {
+        ...(updates[projectTitle] ?? createDefaultUpdate(project)),
+        isVisible,
+        savedAt,
+      },
+    };
+
+    setUpdates(nextUpdates);
+    saveUpdates(nextUpdates);
+    setLastSaved(savedAt);
   };
 
   const handleSave = (projectTitle?: string) => {
@@ -175,7 +201,7 @@ export function Admin() {
       });
       const statusCounts = STATUS_OPTIONS.map((status) => ({
         status,
-        count: projects.filter((project) => (updates[project.title] ?? createDefaultUpdate(project)).status === status).length,
+        count: visibleProjects.filter((project) => (updates[project.title] ?? createDefaultUpdate(project)).status === status).length,
       }));
 
       const cover = pptx.addSlide();
@@ -185,8 +211,8 @@ export function Admin() {
       cover.addText('Prepared for management review', { x: 0.62, y: 1.95, w: 6.8, h: 0.35, fontSize: 15, color: 'A7B4C8', margin: 0 });
       cover.addText(`Generated ${generatedAt}`, { x: 0.62, y: 6.75, w: 4.5, h: 0.25, fontSize: 10, color: '7DD3FC', margin: 0 });
 
-      cover.addText(String(projects.length), { x: 0.7, y: 3.05, w: 2.5, h: 0.5, fontSize: 30, bold: true, color: 'FFFFFF', margin: 0.08, fill: { color: '14375F' }, breakLine: false });
-      cover.addText('Projects in Admin List', { x: 0.72, y: 3.62, w: 2.45, h: 0.35, fontSize: 10, bold: true, color: '66F6FF', margin: 0.08, fill: { color: '14375F' } });
+      cover.addText(String(visibleProjects.length), { x: 0.7, y: 3.05, w: 2.5, h: 0.5, fontSize: 30, bold: true, color: 'FFFFFF', margin: 0.08, fill: { color: '14375F' }, breakLine: false });
+      cover.addText('Visible Projects', { x: 0.72, y: 3.62, w: 2.45, h: 0.35, fontSize: 10, bold: true, color: '66F6FF', margin: 0.08, fill: { color: '14375F' } });
 
       statusCounts.forEach(({ status, count }, index) => {
         const x = 3.55 + index * 2.2;
@@ -195,11 +221,11 @@ export function Admin() {
       });
 
       cover.addText(
-        'This deck is generated from the editable Admin page. Status, current progress, and way forward fields reflect the latest saved or on-screen values in the browser.',
+        'This deck is generated from visible projects in the editable Admin page. Hidden projects are excluded from the management export.',
         { x: 0.65, y: 4.75, w: 11.9, h: 0.75, fontSize: 13, color: 'D8E2F0', margin: 0.1, breakLine: false },
       );
 
-      for (const [index, project] of projects.entries()) {
+      for (const [index, project] of visibleProjects.entries()) {
         const update = updates[project.title] ?? createDefaultUpdate(project);
         const imageData = await getImageDataUri('image' in project ? project.image : undefined);
         const statusColor = getStatusColor(update.status);
@@ -311,7 +337,9 @@ export function Admin() {
                 </div>
                 <div>
                   <h3 className="font-bold text-white">Project Management Update List</h3>
-                  <p className="text-sm text-slate-400">{projects.length} projects copied from Project History.</p>
+                  <p className="text-sm text-slate-400">
+                    Showing {visibleProjects.length} of {projects.length} projects. Hidden projects are excluded from PowerPoint export.
+                  </p>
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-3">
@@ -337,8 +365,35 @@ export function Admin() {
             </div>
             {exportError && <p className="mb-4 text-sm font-medium text-orange-300">{exportError}</p>}
 
+            {hiddenProjects.length > 0 && (
+              <div className="glass-panel mb-5 p-4">
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <h4 className="text-sm font-bold text-white">Hidden Projects</h4>
+                    <p className="text-xs text-slate-400">Use Show to return a project to the Admin list.</p>
+                  </div>
+                  <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-bold text-slate-300">
+                    {hiddenProjects.length} hidden
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {hiddenProjects.map((project) => (
+                    <button
+                      key={project.title}
+                      type="button"
+                      onClick={() => handleVisibilityChange(project.title, true)}
+                      className="inline-flex items-center gap-2 rounded-lg border border-electric-cyan/25 bg-electric-cyan/10 px-3 py-2 text-xs font-bold text-electric-cyan transition hover:border-electric-cyan/60 hover:bg-electric-cyan/15"
+                    >
+                      <Eye className="h-3.5 w-3.5" aria-hidden="true" />
+                      {project.title}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="overflow-x-auto rounded-xl border border-electric-cyan/15 bg-navy-900/45 shadow-2xl shadow-black/20">
-              <table className="min-w-[1320px] w-full border-collapse text-left">
+              <table className="min-w-[1360px] w-full border-collapse text-left">
                 <thead className="bg-navy-800/90 text-xs uppercase tracking-widest text-electric-cyan">
                   <tr>
                     <th className="w-12 px-4 py-4">No</th>
@@ -348,12 +403,19 @@ export function Admin() {
                     <th className="w-80 px-4 py-4">Value Summary</th>
                     <th className="w-96 px-4 py-4">Current Progress</th>
                     <th className="w-96 px-4 py-4">Way Forward</th>
-                    <th className="w-32 px-4 py-4">Action</th>
+                    <th className="w-40 px-4 py-4">Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {projects.map((project, index) => {
-                    const update = updates[project.title] ?? createDefaultUpdate(project);
+                  {visibleProjects.length === 0 && (
+                    <tr className="border-t border-white/10">
+                      <td colSpan={8} className="px-4 py-10 text-center text-sm text-slate-400">
+                        No visible projects. Restore a project from Hidden Projects above.
+                      </td>
+                    </tr>
+                  )}
+                  {visibleProjects.map((project, index) => {
+                    const update = getProjectUpdate(project);
 
                     return (
                       <tr key={project.title} className="border-t border-white/10 align-top odd:bg-white/[0.025] hover:bg-electric-cyan/[0.035]">
@@ -417,10 +479,18 @@ export function Admin() {
                           <button
                             type="button"
                             onClick={() => handleSave(project.title)}
-                            className="btn-secondary inline-flex items-center gap-2 whitespace-nowrap"
+                            className="btn-secondary mb-2 inline-flex items-center gap-2 whitespace-nowrap"
                           >
                             <Save className="h-4 w-4" aria-hidden="true" />
                             Save
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleVisibilityChange(project.title, false)}
+                            className="btn-secondary inline-flex items-center gap-2 whitespace-nowrap"
+                          >
+                            <EyeOff className="h-4 w-4" aria-hidden="true" />
+                            Hide
                           </button>
                           {update.savedAt && <div className="mt-2 text-xs text-slate-500">{update.savedAt}</div>}
                         </td>
