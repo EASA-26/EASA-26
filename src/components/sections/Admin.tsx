@@ -154,6 +154,16 @@ export function Admin() {
   const deployedCount = statusSummary.find((item) => item.status === 'Deployed')?.count ?? 0;
   const activeBuildCount = visibleProjects.filter((project) => ['Prototype', 'Pilot'].includes(getProjectUpdate(project).status)).length;
   const plannedCount = statusSummary.find((item) => item.status === 'Planned')?.count ?? 0;
+  const projectUpdateReadyCount = visibleProjects.filter((project) => {
+    const update = getProjectUpdate(project);
+    return update.currentProgress.trim().length > 0 && update.wayForward.trim().length > 0;
+  }).length;
+  const stakeholderSummary = Array.from(
+    visibleProjects.reduce<Map<string, number>>((summary, project) => {
+      summary.set(project.stakeholders, (summary.get(project.stakeholders) ?? 0) + 1);
+      return summary;
+    }, new Map()),
+  ).sort(([, countA], [, countB]) => countB - countA);
   const maximizedKpiRow = maximizedKpiIndex !== null ? kpiRows[maximizedKpiIndex] : undefined;
 
   const handleUnlock = (event: FormEvent<HTMLFormElement>) => {
@@ -486,6 +496,91 @@ export function Admin() {
               </div>
             </div>
             {exportError && <p className="mb-4 text-sm font-medium text-orange-300">{exportError}</p>}
+
+            <div className="mb-6 grid gap-5 xl:grid-cols-[0.82fr_1.18fr]">
+              <div className="glass-card p-5">
+                <div className="mb-5 flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-electric-cyan/30 bg-electric-cyan/10 text-electric-cyan">
+                    <BarChart3 className="h-5 w-5" aria-hidden="true" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-white">Project Update Analytics</h4>
+                    <p className="text-sm text-slate-400">Live summary from the editable management list.</p>
+                  </div>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {[
+                    { label: 'Visible Projects', value: visibleProjects.length, tone: 'text-white' },
+                    { label: 'Deployed', value: deployedCount, tone: 'text-accent-green' },
+                    { label: 'Pilot / Prototype', value: activeBuildCount, tone: 'text-electric-cyan' },
+                    { label: 'Update Ready', value: projectUpdateReadyCount, tone: 'text-sky-300' },
+                  ].map((metric) => (
+                    <div key={metric.label} className="rounded-xl border border-white/10 bg-navy-900/70 p-4">
+                      <div className={`text-3xl font-black ${metric.tone}`}>{metric.value}</div>
+                      <div className="mt-2 text-[0.65rem] font-bold uppercase tracking-widest text-slate-400">{metric.label}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 rounded-xl border border-orange-300/20 bg-orange-300/10 p-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="text-sm font-bold text-orange-200">Hidden from PPT</span>
+                    <span className="text-2xl font-black text-orange-200">{hiddenProjects.length}</span>
+                  </div>
+                  <p className="mt-1 text-xs text-slate-400">Hidden projects stay saved but are excluded from the management export.</p>
+                </div>
+              </div>
+
+              <div className="glass-card p-5">
+                <div className="grid gap-6 lg:grid-cols-2">
+                  <div>
+                    <h4 className="mb-4 text-sm font-bold uppercase tracking-[0.22em] text-electric-cyan">Status Breakdown</h4>
+                    <div className="space-y-4">
+                      {statusSummary.map((item) => {
+                        const percentage = visibleProjects.length ? Math.round((item.count / visibleProjects.length) * 100) : 0;
+
+                        return (
+                          <div key={item.status}>
+                            <div className="mb-2 flex items-center justify-between text-sm">
+                              <span className="font-bold" style={{ color: `#${getStatusColor(item.status)}` }}>{item.status}</span>
+                              <span className="text-slate-300">{item.count} / {visibleProjects.length}</span>
+                            </div>
+                            <div className="h-3 overflow-hidden rounded-full bg-navy-950/80">
+                              <div
+                                className="h-full rounded-full transition-all"
+                                style={{ width: `${percentage}%`, backgroundColor: `#${getStatusColor(item.status)}` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div>
+                    <h4 className="mb-4 text-sm font-bold uppercase tracking-[0.22em] text-accent-green">Stakeholder Coverage</h4>
+                    <div className="space-y-3">
+                      {stakeholderSummary.map(([stakeholder, count]) => {
+                        const percentage = visibleProjects.length ? Math.round((count / visibleProjects.length) * 100) : 0;
+
+                        return (
+                          <div key={stakeholder} className="rounded-xl border border-white/10 bg-navy-900/70 p-3">
+                            <div className="flex items-center justify-between gap-3 text-sm">
+                              <span className="font-bold text-white">{stakeholder}</span>
+                              <span className="text-slate-300">{count} project{count === 1 ? '' : 's'}</span>
+                            </div>
+                            <div className="mt-2 h-2 overflow-hidden rounded-full bg-navy-950/80">
+                              <div className="h-full rounded-full bg-gradient-to-r from-electric-cyan to-accent-green" style={{ width: `${percentage}%` }} />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             {hiddenProjects.length > 0 && (
               <div className="glass-panel mb-5 p-4">
