@@ -643,7 +643,7 @@ export function Admin() {
                 <div>
                   <h3 className="font-bold text-white">Project Management Update List</h3>
                   <p className="text-sm text-slate-400">
-                    Showing {visibleProjects.length} of {projects.length} projects. Hidden projects are excluded from PowerPoint export.
+                    Showing {visibleProjects.length} visible projects. Hidden projects are excluded from statistics and PowerPoint export.
                   </p>
                 </div>
               </div>
@@ -696,13 +696,6 @@ export function Admin() {
                   ))}
                 </div>
 
-                <div className="mt-4 rounded-xl border border-orange-300/20 bg-orange-300/10 p-4">
-                  <div className="flex items-center justify-between gap-4">
-                    <span className="text-sm font-bold text-orange-200">Hidden from PPT</span>
-                    <span className="text-2xl font-black text-orange-200">{hiddenProjects.length}</span>
-                  </div>
-                  <p className="mt-1 text-xs text-slate-400">Hidden projects stay saved but are excluded from the management export.</p>
-                </div>
               </div>
 
               <div className="glass-card p-5">
@@ -1068,13 +1061,12 @@ export function Admin() {
 
                 {activeKpiPage === 'overview' ? (
                   <>
-                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                       {[
                         { label: 'Visible Projects', value: visibleProjects.length, tone: 'text-white' },
                         { label: 'Deployed', value: deployedCount, tone: 'text-accent-green' },
                         { label: 'Pilot / Prototype', value: activeBuildCount, tone: 'text-electric-cyan' },
                         { label: 'Planned', value: plannedCount, tone: 'text-sky-300' },
-                        { label: 'Hidden', value: hiddenProjects.length, tone: 'text-orange-300' },
                       ].map((metric) => (
                         <div key={metric.label} className="glass-card p-5">
                           <div className={`text-4xl font-black ${metric.tone}`}>{metric.value}</div>
