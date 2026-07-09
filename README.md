@@ -68,6 +68,11 @@ To add a new project to the history section, simply add a new object to the `pro
 ### Updating the Org Chart
 To modify roles or personnel, edit the `orgStructureData` array in `src/data/content.ts`.
 
+### Shared Admin Updates
+The Admin Project Update page saves changes locally first, then can sync the same updates across laptops through `public/easa-admin-shared-state.json` in this GitHub repository.
+
+For shared saving, each admin laptop needs a GitHub fine-grained token with **Contents: Read and Write** permission for this repository. Enter the token once in the Admin page under **Shared Laptop Sync**, then use **Pull Latest** before editing and **Save** or **Save All** after editing.
+
 ---
 
 ## Theming & Styling

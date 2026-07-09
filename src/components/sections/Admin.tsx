@@ -1,13 +1,32 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
-import { BarChart3, Eye, EyeOff, FileDown, ImageIcon, Lock, LogOut, Maximize2, Save, ShieldCheck, X } from 'lucide-react';
+import {
+  BarChart3,
+  Cloud,
+  DownloadCloud,
+  Eye,
+  EyeOff,
+  FileDown,
+  ImageIcon,
+  KeyRound,
+  Lock,
+  LogOut,
+  Maximize2,
+  Save,
+  ShieldCheck,
+  X,
+} from 'lucide-react';
 import { motion } from 'framer-motion';
 import { projectHistoryData } from '../../data/content';
 
 const ADMIN_PASSWORD = 'easa26';
 const ADMIN_UNLOCK_KEY = 'easa-admin-unlocked';
 const ADMIN_STORAGE_KEY = 'easa-project-management-updates';
+const ADMIN_GITHUB_TOKEN_KEY = 'easa-admin-github-token';
 const EASA_KPI_STORAGE_KEY = 'easa-kpi-internal-process-neutral-headers';
+const ADMIN_SHARED_STATE_PATH = 'public/easa-admin-shared-state.json';
+const ADMIN_SHARED_BRANCH = 'main';
+const ADMIN_SHARED_STATE_URL = `https://api.github.com/repos/EASA-26/EASA-26/contents/${ADMIN_SHARED_STATE_PATH}`;
 const STATUS_OPTIONS = ['Prototype', 'Deployed', 'Pilot', 'Planned'] as const;
 
 type Project = (typeof projectHistoryData.projects)[number];
@@ -19,12 +38,35 @@ type AdminProjectUpdate = {
   currentProgress: string;
   wayForward: string;
   savedAt?: string;
+  savedAtIso?: string;
 };
 
 type AdminProjectUpdates = Record<string, AdminProjectUpdate>;
 type AdminPage = 'project-update' | 'kpi';
 type KpiPage = 'overview' | 'easa-kpi';
 type EasaKpiRow = Record<string, string>;
+type SyncStatus = 'idle' | 'loading' | 'saving' | 'synced' | 'local' | 'error';
+
+type SharedAdminState = {
+  version: 1;
+  updatedAt: string;
+  projectUpdates: AdminProjectUpdates;
+  kpiRows: EasaKpiRow[];
+};
+
+type GitHubContentResponse = {
+  content?: string;
+  encoding?: string;
+  sha?: string;
+  message?: string;
+};
+
+type GitHubPutResponse = {
+  content?: {
+    sha?: string;
+  };
+  message?: string;
+};
 
 const EASA_KPI_COLUMNS = [
   'Scope',
@@ -263,17 +305,147 @@ const compactSlideText = (value: string, maxLength = 210) => {
   return cleanValue.length > maxLength ? `${cleanValue.slice(0, maxLength - 1)}...` : cleanValue;
 };
 
+const createSaveStamp = () => {
+  const date = new Date();
+
+  return {
+    savedAt: date.toLocaleString('en-MY', {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    }),
+    savedAtIso: date.toISOString(),
+  };
+};
+
+const normalizeProjectUpdates = (savedUpdates: AdminProjectUpdates = {}) =>
+  projectHistoryData.projects.reduce<AdminProjectUpdates>((result, project) => {
+    result[project.title] = {
+      ...createDefaultUpdate(project),
+      ...savedUpdates[project.title],
+    };
+    return result;
+  }, {});
+
+const encodeBase64 = (value: string) => {
+  const bytes = new TextEncoder().encode(value);
+  let binary = '';
+  bytes.forEach((byte) => {
+    binary += String.fromCharCode(byte);
+  });
+
+  return btoa(binary);
+};
+
+const decodeBase64 = (value: string) => {
+  const binary = atob(value.replace(/\s/g, ''));
+  const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+
+  return new TextDecoder().decode(bytes);
+};
+
+const getGitHubHeaders = (token: string) => {
+  const headers: Record<string, string> = {
+    Accept: 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28',
+  };
+
+  if (token.trim()) {
+    headers.Authorization = `Bearer ${token.trim()}`;
+  }
+
+  return headers;
+};
+
+const formatRemoteTimestamp = (value: string) => {
+  if (!value) {
+    return '';
+  }
+
+  return new Date(value).toLocaleString('en-MY', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  });
+};
+
+const createSharedAdminState = (projectUpdates: AdminProjectUpdates, kpiRows: EasaKpiRow[]): SharedAdminState => ({
+  version: 1,
+  updatedAt: new Date().toISOString(),
+  projectUpdates,
+  kpiRows,
+});
+
+const fetchSharedAdminState = async (token: string) => {
+  const response = await fetch(`${ADMIN_SHARED_STATE_URL}?ref=${ADMIN_SHARED_BRANCH}&ts=${Date.now()}`, {
+    headers: getGitHubHeaders(token),
+  });
+
+  if (!response.ok) {
+    throw new Error(`GitHub shared state read failed with ${response.status}`);
+  }
+
+  const data = await response.json() as GitHubContentResponse;
+  const parsedState = data.content
+    ? JSON.parse(decodeBase64(data.content)) as SharedAdminState
+    : createSharedAdminState({}, EASA_KPI_DEFAULT_ROWS);
+
+  return {
+    sha: data.sha ?? '',
+    state: {
+      ...parsedState,
+      projectUpdates: normalizeProjectUpdates(parsedState.projectUpdates),
+      kpiRows: parsedState.kpiRows?.length ? parsedState.kpiRows : EASA_KPI_DEFAULT_ROWS,
+    },
+  };
+};
+
+const saveSharedAdminState = async (token: string, sha: string, state: SharedAdminState) => {
+  if (!token.trim()) {
+    throw new Error('GitHub token is required for shared save.');
+  }
+
+  const response = await fetch(ADMIN_SHARED_STATE_URL, {
+    method: 'PUT',
+    headers: {
+      ...getGitHubHeaders(token),
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      message: 'Update EASA admin shared state',
+      content: encodeBase64(JSON.stringify(state, null, 2)),
+      branch: ADMIN_SHARED_BRANCH,
+      ...(sha ? { sha } : {}),
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`GitHub shared state save failed with ${response.status}`);
+  }
+
+  return response.json() as Promise<GitHubPutResponse>;
+};
+
 const loadSavedUpdates = (): AdminProjectUpdates => {
   try {
     const saved = localStorage.getItem(ADMIN_STORAGE_KEY);
-    return saved ? JSON.parse(saved) as AdminProjectUpdates : {};
+    return saved ? normalizeProjectUpdates(JSON.parse(saved) as AdminProjectUpdates) : normalizeProjectUpdates();
   } catch {
-    return {};
+    return normalizeProjectUpdates();
   }
 };
 
 const saveUpdates = (updates: AdminProjectUpdates) => {
   localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(updates));
+};
+
+const loadSavedGithubToken = () => localStorage.getItem(ADMIN_GITHUB_TOKEN_KEY) ?? '';
+
+const saveGithubToken = (token: string) => {
+  if (token.trim()) {
+    localStorage.setItem(ADMIN_GITHUB_TOKEN_KEY, token.trim());
+    return;
+  }
+
+  localStorage.removeItem(ADMIN_GITHUB_TOKEN_KEY);
 };
 
 const loadSavedKpiRows = () => {
@@ -293,17 +465,7 @@ export function Admin() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isUnlocked, setIsUnlocked] = useState(() => sessionStorage.getItem(ADMIN_UNLOCK_KEY) === 'true');
-  const [updates, setUpdates] = useState<AdminProjectUpdates>(() => {
-    const savedUpdates = loadSavedUpdates();
-
-    return projectHistoryData.projects.reduce<AdminProjectUpdates>((result, project) => {
-      result[project.title] = {
-        ...createDefaultUpdate(project),
-        ...savedUpdates[project.title],
-      };
-      return result;
-    }, {});
-  });
+  const [updates, setUpdates] = useState<AdminProjectUpdates>(() => loadSavedUpdates());
   const [lastSaved, setLastSaved] = useState('');
   const [isExporting, setIsExporting] = useState(false);
   const [exportError, setExportError] = useState('');
@@ -313,6 +475,11 @@ export function Admin() {
   const [kpiRows, setKpiRows] = useState<EasaKpiRow[]>(() => loadSavedKpiRows());
   const [kpiLastSaved, setKpiLastSaved] = useState('');
   const [maximizedKpiIndex, setMaximizedKpiIndex] = useState<number | null>(null);
+  const [githubToken, setGithubToken] = useState(() => loadSavedGithubToken());
+  const [sharedSha, setSharedSha] = useState('');
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
+  const [syncMessage, setSyncMessage] = useState('');
+  const [remoteUpdatedAt, setRemoteUpdatedAt] = useState('');
 
   const projects = projectHistoryData.projects;
   const getProjectUpdate = (project: Project) => updates[project.title] ?? createDefaultUpdate(project);
@@ -338,6 +505,100 @@ export function Admin() {
     }, new Map()),
   ).sort(([, countA], [, countB]) => countB - countA);
   const maximizedKpiRow = maximizedKpiIndex !== null ? kpiRows[maximizedKpiIndex] : undefined;
+  const syncStatusLabel = {
+    idle: 'Ready',
+    loading: 'Pulling',
+    saving: 'Saving',
+    synced: 'Synced',
+    local: 'Local only',
+    error: 'Check sync',
+  }[syncStatus];
+  const syncStatusClassName = {
+    idle: 'text-slate-300',
+    loading: 'text-sky-300',
+    saving: 'text-sky-300',
+    synced: 'text-accent-green',
+    local: 'text-orange-200',
+    error: 'text-orange-300',
+  }[syncStatus];
+
+  const applySharedState = (state: SharedAdminState) => {
+    const nextUpdates = normalizeProjectUpdates(state.projectUpdates);
+    const nextKpiRows = state.kpiRows?.length ? state.kpiRows : EASA_KPI_DEFAULT_ROWS;
+
+    setUpdates(nextUpdates);
+    setKpiRows(nextKpiRows);
+    saveUpdates(nextUpdates);
+    saveKpiRows(nextKpiRows);
+    setRemoteUpdatedAt(formatRemoteTimestamp(state.updatedAt));
+  };
+
+  const handlePullSharedState = async (isSilent = false) => {
+    setSyncStatus('loading');
+    if (!isSilent) {
+      setSyncMessage('Pulling latest shared update from GitHub...');
+    }
+
+    try {
+      const { sha, state } = await fetchSharedAdminState(githubToken);
+      applySharedState(state);
+      setSharedSha(sha);
+      setSyncStatus('synced');
+      setSyncMessage(`Latest shared update loaded${state.updatedAt ? ` (${formatRemoteTimestamp(state.updatedAt)})` : ''}.`);
+    } catch {
+      setSyncStatus(githubToken.trim() ? 'error' : 'local');
+      setSyncMessage(
+        githubToken.trim()
+          ? 'Unable to load shared update. Please check token permission or connection.'
+          : 'Using this laptop copy. Add a GitHub token to save and pull shared updates.',
+      );
+    }
+  };
+
+  const persistSharedAdminState = async (
+    nextUpdates: AdminProjectUpdates,
+    nextKpiRows: EasaKpiRow[],
+    options: { projectTitle?: string; isKpiSave?: boolean } = {},
+  ) => {
+    if (!githubToken.trim()) {
+      setSyncStatus('local');
+      setSyncMessage('Saved on this laptop. Add a GitHub token to save changes for other laptops.');
+      return;
+    }
+
+    setSyncStatus('saving');
+    setSyncMessage('Saving shared update to GitHub...');
+
+    try {
+      const latest = await fetchSharedAdminState(githubToken);
+      const remoteUpdates = normalizeProjectUpdates(latest.state.projectUpdates);
+      const projectUpdates = options.projectTitle
+        ? {
+            ...remoteUpdates,
+            [options.projectTitle]: nextUpdates[options.projectTitle],
+          }
+        : options.isKpiSave
+          ? remoteUpdates
+          : nextUpdates;
+      const sharedState = createSharedAdminState(
+        projectUpdates,
+        options.isKpiSave ? nextKpiRows : latest.state.kpiRows?.length ? latest.state.kpiRows : nextKpiRows,
+      );
+      const saved = await saveSharedAdminState(githubToken, latest.sha || sharedSha, sharedState);
+
+      setSharedSha(saved.content?.sha ?? latest.sha);
+      setRemoteUpdatedAt(formatRemoteTimestamp(sharedState.updatedAt));
+      setSyncStatus('synced');
+      setSyncMessage('Shared save complete. Other laptops can use Pull Latest to see the update.');
+    } catch {
+      setSyncStatus('error');
+      setSyncMessage('Saved locally, but shared GitHub save failed. Check token permission, then save again.');
+    }
+  };
+
+  useEffect(() => {
+    saveGithubToken(githubToken);
+  }, [githubToken]);
 
   const handleUnlock = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -347,6 +608,9 @@ export function Admin() {
       setIsUnlocked(true);
       setError('');
       setPassword('');
+      window.setTimeout(() => {
+        void handlePullSharedState(true);
+      }, 0);
       return;
     }
 
@@ -369,37 +633,32 @@ export function Admin() {
 
   const handleVisibilityChange = (projectTitle: string, isVisible: boolean) => {
     const project = projects.find((item) => item.title === projectTitle) ?? projects[0];
-    const savedAt = new Date().toLocaleString('en-MY', {
-      dateStyle: 'medium',
-      timeStyle: 'short',
-    });
+    const saveStamp = createSaveStamp();
 
     const nextUpdates = {
       ...updates,
       [projectTitle]: {
         ...(updates[projectTitle] ?? createDefaultUpdate(project)),
         isVisible,
-        savedAt,
+        ...saveStamp,
       },
     };
 
     setUpdates(nextUpdates);
     saveUpdates(nextUpdates);
-    setLastSaved(savedAt);
+    setLastSaved(saveStamp.savedAt);
+    void persistSharedAdminState(nextUpdates, kpiRows, { projectTitle });
   };
 
   const handleSave = (projectTitle?: string) => {
-    const savedAt = new Date().toLocaleString('en-MY', {
-      dateStyle: 'medium',
-      timeStyle: 'short',
-    });
+    const saveStamp = createSaveStamp();
 
     const nextUpdates = projectTitle
       ? {
           ...updates,
           [projectTitle]: {
-            ...updates[projectTitle],
-            savedAt,
+            ...(updates[projectTitle] ?? createDefaultUpdate(projects.find((project) => project.title === projectTitle) ?? projects[0])),
+            ...saveStamp,
           },
         }
       : Object.fromEntries(
@@ -407,14 +666,15 @@ export function Admin() {
             title,
             {
               ...update,
-              savedAt,
+              ...saveStamp,
             },
           ]),
         ) as AdminProjectUpdates;
 
     setUpdates(nextUpdates);
     saveUpdates(nextUpdates);
-    setLastSaved(savedAt);
+    setLastSaved(saveStamp.savedAt);
+    void persistSharedAdminState(nextUpdates, kpiRows, { projectTitle });
   };
 
   const handleKpiCellUpdate = (rowIndex: number, column: string, value: string) => {
@@ -424,19 +684,18 @@ export function Admin() {
   };
 
   const handleSaveKpiRows = () => {
-    const savedAt = new Date().toLocaleString('en-MY', {
-      dateStyle: 'medium',
-      timeStyle: 'short',
-    });
+    const { savedAt } = createSaveStamp();
 
     saveKpiRows(kpiRows);
     setKpiLastSaved(savedAt);
+    void persistSharedAdminState(updates, kpiRows, { isKpiSave: true });
   };
 
   const handleResetKpiRows = () => {
     setKpiRows(EASA_KPI_DEFAULT_ROWS);
     saveKpiRows(EASA_KPI_DEFAULT_ROWS);
     setKpiLastSaved('Reset to Excel template');
+    void persistSharedAdminState(updates, EASA_KPI_DEFAULT_ROWS, { isKpiSave: true });
   };
 
   const handleExportPowerPoint = async () => {
@@ -669,6 +928,51 @@ export function Admin() {
               </div>
             </div>
             {exportError && <p className="mb-4 text-sm font-medium text-orange-300">{exportError}</p>}
+
+            <div className="glass-panel mb-6 grid gap-4 p-4 xl:grid-cols-[1fr_auto] xl:items-center">
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-electric-cyan/30 bg-electric-cyan/10 text-electric-cyan">
+                  <Cloud className="h-5 w-5" aria-hidden="true" />
+                </div>
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h4 className="font-bold text-white">Shared Laptop Sync</h4>
+                    <span className={`rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-widest ${syncStatusClassName}`}>
+                      {syncStatusLabel}
+                    </span>
+                    {remoteUpdatedAt && <span className="text-xs text-slate-500">Latest shared: {remoteUpdatedAt}</span>}
+                  </div>
+                  <p className="mt-1 text-sm text-slate-400">
+                    {syncMessage || 'Pull latest before editing. Save writes to this laptop and, with token access, to the shared GitHub state for other laptops.'}
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <label htmlFor="github-sync-token" className="sr-only">
+                  GitHub token for shared admin save
+                </label>
+                <div className="relative min-w-0 sm:w-80">
+                  <KeyRound className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" aria-hidden="true" />
+                  <input
+                    id="github-sync-token"
+                    type="password"
+                    value={githubToken}
+                    onChange={(event) => setGithubToken(event.target.value)}
+                    className="w-full rounded-lg border border-electric-cyan/20 bg-navy-950/75 py-3 pl-10 pr-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-electric-cyan focus:ring-2 focus:ring-electric-cyan/25"
+                    placeholder="GitHub token for shared save"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => void handlePullSharedState(false)}
+                  disabled={syncStatus === 'loading' || syncStatus === 'saving'}
+                  className="btn-secondary inline-flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <DownloadCloud className="h-4 w-4" aria-hidden="true" />
+                  Pull Latest
+                </button>
+              </div>
+            </div>
 
             <div className="mb-6 grid gap-5 xl:grid-cols-[0.82fr_1.18fr]">
               <div className="glass-card p-5">
