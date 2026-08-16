@@ -24,17 +24,6 @@ export function Introduction() {
               </span>
               <VisitorCounter />
             </div>
-            <div className="tnb-logo-rail mb-8 justify-start">
-              {introData.logos.map((logo) => (
-                <div key={logo.id} className="tnb-logo-card">
-                  <img
-                    src={`${import.meta.env.BASE_URL}${logo.src}`}
-                    alt={`${logo.name} logo`}
-                    className="max-h-full max-w-full object-contain"
-                  />
-                </div>
-              ))}
-            </div>
             <h1 className="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-electric-cyan to-accent-green mb-6 tracking-tight leading-tight">
               {introData.title}
             </h1>
