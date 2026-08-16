@@ -23,9 +23,9 @@ export const introData = {
   title: "Enterprise AI Solution Architect",
   acronym: "EASA",
   logos: [
-    { id: "tnb-genco", name: "TNB Genco", src: "tnb-genco-logo.png" },
-    { id: "ted", name: "Technology & Engineering Department", src: "ted-logo.png" },
     { id: "easa", name: "EASA", src: "easa-logo.png" },
+    { id: "ted", name: "Technology & Engineering Department", src: "ted-logo.png" },
+    { id: "tnb-genco", name: "TNB Genco", src: "tnb-genco-logo.png" },
   ],
   subtitle: "Building AI power capabilities for intelligent power generation.",
   description: "Enterprise AI Solution Architect designs secure AI applications, analytics platforms, data services, and delivery practices that turn power plant operational challenges into measurable business value.",
@@ -39,7 +39,7 @@ export const introData = {
     ]
   },
   metrics: [
-    { id: 1, label: "AI Projects Pipeline", value: "16" },
+    { id: 1, label: "AI Projects Pipeline", value: "17" },
     { id: 2, label: "Active Pilots / Prototypes", value: "11" },
     { id: 3, label: "Stakeholder Departments", value: "7" },
   ]
@@ -101,12 +101,21 @@ export const rizalSubordinateData = [
 
 export const projectHistoryData = {
   metrics: {
-    totalProjects: "16",
+    totalProjects: "17",
     activePilots: "11",
-    deployedSolutions: "3",
+    deployedSolutions: "4",
     stakeholdersEngaged: "7"
   },
   projects: [
+    {
+      title: "FazuraGPT",
+      image: "fazuragpt-ui.png",
+      problem: "Genco knowledge is distributed across RCA documents, project records, ISO references, policies, handbooks, guidelines, reports, and other controlled documents, making it difficult for employees to retrieve reliable answers quickly.",
+      approach: "Genco Knowledge Hub using an AI LLM chatbot with retrieval-augmented generation, controlled document scope, classification filters, role-based access, and approved knowledge sources for Genco-only information.",
+      stakeholders: "All Genco Employees",
+      value: "Deployed as a ChatGPT-like internal knowledge assistant that helps employees search, summarize, and ask questions against confined Genco knowledge sources with governed access.",
+      status: "Deployed"
+    },
     {
       title: "PeopleModelling.AI",
       image: "peoplemodelling-ai-ui.png",
