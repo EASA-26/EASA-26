@@ -40,7 +40,7 @@ export const introData = {
   },
   metrics: [
     { id: 1, label: "AI Projects Pipeline", value: "17" },
-    { id: 2, label: "Active Pilots / Prototypes", value: "11" },
+    { id: 2, label: "Active Pilots / Prototypes", value: "12" },
     { id: 3, label: "Stakeholder Departments", value: "7" },
   ]
 };
@@ -102,7 +102,7 @@ export const rizalSubordinateData = [
 export const projectHistoryData = {
   metrics: {
     totalProjects: "17",
-    activePilots: "11",
+    activePilots: "12",
     deployedSolutions: "4",
     stakeholdersEngaged: "7"
   },
@@ -157,8 +157,8 @@ export const projectHistoryData = {
       problem: "Project finance modelling and scenario simulation are time-consuming when assumptions, tariff, returns, leverage, and model health are handled manually.",
       approach: "AI-assisted financial modelling control center for project finance dashboards, scenario simulation, calculation support, model audit checks, and AI assistant review.",
       stakeholders: "Finance",
-      value: "Planned to support faster project finance review, scenario comparison, investment decision preparation, and model quality checks.",
-      status: "Planned"
+      value: "Prototype supports faster project finance review, scenario comparison, investment decision preparation, and model quality checks.",
+      status: "Prototype"
     },
     {
       title: "RCA.AI",
