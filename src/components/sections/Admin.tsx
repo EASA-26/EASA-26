@@ -9,11 +9,14 @@ import {
   FileDown,
   ImageIcon,
   KeyRound,
+  Lightbulb,
   Lock,
   LogOut,
   Maximize2,
+  Plus,
   Save,
   ShieldCheck,
+  Trash2,
   X,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -24,10 +27,16 @@ const ADMIN_UNLOCK_KEY = 'easa-admin-unlocked';
 const ADMIN_STORAGE_KEY = 'easa-project-management-updates';
 const ADMIN_GITHUB_TOKEN_KEY = 'easa-admin-github-token';
 const EASA_KPI_STORAGE_KEY = 'easa-kpi-internal-process-neutral-headers';
+const IGS_STORAGE_KEY = 'easa-igs-idea-register';
 const ADMIN_SHARED_STATE_PATH = 'public/easa-admin-shared-state.json';
 const ADMIN_SHARED_BRANCH = 'main';
 const ADMIN_SHARED_STATE_URL = `https://api.github.com/repos/EASA-26/EASA-26/contents/${ADMIN_SHARED_STATE_PATH}`;
 const STATUS_OPTIONS = ['Prototype', 'Deployed', 'Pilot', 'Planned'] as const;
+const IGS_SCORE_OPTIONS = ['1', '2', '3', '4', '5'] as const;
+const IGS_PAGES = [
+  { id: 'spg', label: 'SPG' },
+  { id: 'tnbj', label: 'TNBJ' },
+] as const;
 
 type Project = (typeof projectHistoryData.projects)[number];
 type StatusOption = (typeof STATUS_OPTIONS)[number];
@@ -42,9 +51,19 @@ type AdminProjectUpdate = {
 };
 
 type AdminProjectUpdates = Record<string, AdminProjectUpdate>;
-type AdminPage = 'project-update' | 'kpi';
+type AdminPage = 'project-update' | 'kpi' | 'igs';
 type KpiPage = 'overview' | 'easa-kpi';
 type EasaKpiRow = Record<string, string>;
+type IgsPage = (typeof IGS_PAGES)[number]['id'];
+type IgsScore = (typeof IGS_SCORE_OPTIONS)[number] | '';
+type IgsRow = {
+  ideas: string;
+  stationPic: string;
+  easaPic: string;
+  feasibility: IgsScore;
+  impact: IgsScore;
+};
+type IgsRowsByPage = Record<IgsPage, IgsRow[]>;
 type SyncStatus = 'idle' | 'loading' | 'saving' | 'synced' | 'local' | 'error';
 
 type SharedAdminState = {
@@ -52,6 +71,7 @@ type SharedAdminState = {
   updatedAt: string;
   projectUpdates: AdminProjectUpdates;
   kpiRows: EasaKpiRow[];
+  igsRows?: IgsRowsByPage;
 };
 
 type GitHubContentResponse = {
@@ -278,6 +298,50 @@ const EASA_KPI_DEFAULT_ROWS: EasaKpiRow[] = EASA_KPI_INTERNAL_PROCESS_ROWS.map((
   }, {}),
 );
 
+const createBlankIgsRow = (): IgsRow => ({
+  ideas: '',
+  stationPic: '',
+  easaPic: '',
+  feasibility: '',
+  impact: '',
+});
+
+const createDefaultIgsRows = (): IgsRowsByPage => ({
+  spg: [createBlankIgsRow()],
+  tnbj: [createBlankIgsRow()],
+});
+
+const normalizeIgsScore = (value: unknown): IgsScore =>
+  IGS_SCORE_OPTIONS.includes(value as (typeof IGS_SCORE_OPTIONS)[number])
+    ? value as (typeof IGS_SCORE_OPTIONS)[number]
+    : '';
+
+const normalizeIgsRows = (savedRows?: Partial<Record<IgsPage, IgsRow[]>>): IgsRowsByPage => {
+  const defaults = createDefaultIgsRows();
+
+  return IGS_PAGES.reduce<IgsRowsByPage>((result, page) => {
+    const rows = savedRows?.[page.id];
+
+    result[page.id] = rows?.length
+      ? rows.map((row) => ({
+          ...createBlankIgsRow(),
+          ...row,
+          feasibility: normalizeIgsScore(row.feasibility),
+          impact: normalizeIgsScore(row.impact),
+        }))
+      : defaults[page.id];
+
+    return result;
+  }, {} as IgsRowsByPage);
+};
+
+const calculateIgsPrioritization = (row: IgsRow) => {
+  const feasibility = Number(row.feasibility);
+  const impact = Number(row.impact);
+
+  return feasibility && impact ? String(feasibility * impact) : '';
+};
+
 const createDefaultUpdate = (project: Project): AdminProjectUpdate => ({
   isVisible: true,
   status: STATUS_OPTIONS.includes(project.status as StatusOption) ? project.status as StatusOption : 'Prototype',
@@ -367,11 +431,16 @@ const formatRemoteTimestamp = (value: string) => {
   });
 };
 
-const createSharedAdminState = (projectUpdates: AdminProjectUpdates, kpiRows: EasaKpiRow[]): SharedAdminState => ({
+const createSharedAdminState = (
+  projectUpdates: AdminProjectUpdates,
+  kpiRows: EasaKpiRow[],
+  igsRows: IgsRowsByPage = createDefaultIgsRows(),
+): SharedAdminState => ({
   version: 1,
   updatedAt: new Date().toISOString(),
   projectUpdates,
   kpiRows,
+  igsRows,
 });
 
 const fetchSharedAdminState = async (token: string) => {
@@ -386,7 +455,7 @@ const fetchSharedAdminState = async (token: string) => {
   const data = await response.json() as GitHubContentResponse;
   const parsedState = data.content
     ? JSON.parse(decodeBase64(data.content)) as SharedAdminState
-    : createSharedAdminState({}, EASA_KPI_DEFAULT_ROWS);
+    : createSharedAdminState({}, EASA_KPI_DEFAULT_ROWS, createDefaultIgsRows());
 
   return {
     sha: data.sha ?? '',
@@ -394,6 +463,7 @@ const fetchSharedAdminState = async (token: string) => {
       ...parsedState,
       projectUpdates: normalizeProjectUpdates(parsedState.projectUpdates),
       kpiRows: parsedState.kpiRows?.length ? parsedState.kpiRows : EASA_KPI_DEFAULT_ROWS,
+      igsRows: normalizeIgsRows(parsedState.igsRows),
     },
   };
 };
@@ -461,6 +531,65 @@ const saveKpiRows = (rows: EasaKpiRow[]) => {
   localStorage.setItem(EASA_KPI_STORAGE_KEY, JSON.stringify(rows));
 };
 
+const loadSavedIgsRows = () => {
+  try {
+    const saved = localStorage.getItem(IGS_STORAGE_KEY);
+    return saved ? normalizeIgsRows(JSON.parse(saved) as Partial<IgsRowsByPage>) : createDefaultIgsRows();
+  } catch {
+    return createDefaultIgsRows();
+  }
+};
+
+const saveIgsRows = (rows: IgsRowsByPage) => {
+  localStorage.setItem(IGS_STORAGE_KEY, JSON.stringify(rows));
+};
+
+const escapeExcelXml = (value: string | number) =>
+  String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+
+const createExcelCell = (value: string | number, type: 'Number' | 'String' = 'String') =>
+  `<Cell><Data ss:Type="${type}">${escapeExcelXml(value)}</Data></Cell>`;
+
+const createIgsWorksheetXml = (sheetName: string, rows: IgsRow[]) => {
+  const headerCells = ['No.', 'Ideas', 'Station PIC', 'EASA PIC', 'Feasibility', 'Impact', 'Prioritization']
+    .map((header) => createExcelCell(header))
+    .join('');
+  const dataRows = rows.map((row, index) => {
+    const prioritization = calculateIgsPrioritization(row);
+
+    return `<Row>${[
+      createExcelCell(index + 1, 'Number'),
+      createExcelCell(row.ideas),
+      createExcelCell(row.stationPic),
+      createExcelCell(row.easaPic),
+      createExcelCell(row.feasibility),
+      createExcelCell(row.impact),
+      createExcelCell(prioritization),
+    ].join('')}</Row>`;
+  }).join('');
+
+  return `<Worksheet ss:Name="${escapeExcelXml(sheetName)}"><Table><Row>${headerCells}</Row>${dataRows}</Table></Worksheet>`;
+};
+
+const createIgsExcelXml = (rowsByPage: IgsRowsByPage) => `<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:o="urn:schemas-microsoft-com:office:office"
+  xmlns:x="urn:schemas-microsoft-com:office:excel"
+  xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+  xmlns:html="http://www.w3.org/TR/REC-html40">
+  <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+    <Author>EASA</Author>
+    <Company>TNB Genco</Company>
+  </DocumentProperties>
+  ${IGS_PAGES.map((page) => createIgsWorksheetXml(page.label, rowsByPage[page.id])).join('')}
+</Workbook>`;
+
 export function Admin() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -472,8 +601,11 @@ export function Admin() {
   const [maximizedProjectTitle, setMaximizedProjectTitle] = useState<string | null>(null);
   const [activeAdminPage, setActiveAdminPage] = useState<AdminPage>('project-update');
   const [activeKpiPage, setActiveKpiPage] = useState<KpiPage>('overview');
+  const [activeIgsPage, setActiveIgsPage] = useState<IgsPage>('spg');
   const [kpiRows, setKpiRows] = useState<EasaKpiRow[]>(() => loadSavedKpiRows());
   const [kpiLastSaved, setKpiLastSaved] = useState('');
+  const [igsRows, setIgsRows] = useState<IgsRowsByPage>(() => loadSavedIgsRows());
+  const [igsLastSaved, setIgsLastSaved] = useState('');
   const [maximizedKpiIndex, setMaximizedKpiIndex] = useState<number | null>(null);
   const [githubToken, setGithubToken] = useState(() => loadSavedGithubToken());
   const [sharedSha, setSharedSha] = useState('');
@@ -505,6 +637,15 @@ export function Admin() {
     }, new Map()),
   ).sort(([, countA], [, countB]) => countB - countA);
   const maximizedKpiRow = maximizedKpiIndex !== null ? kpiRows[maximizedKpiIndex] : undefined;
+  const activeIgsStation = IGS_PAGES.find((page) => page.id === activeIgsPage) ?? IGS_PAGES[0];
+  const activeIgsRows = igsRows[activeIgsPage] ?? [];
+  const activeIgsIdeaCount = activeIgsRows.filter((row) => row.ideas.trim()).length;
+  const filledIgsIdeaCount = IGS_PAGES.reduce((count, page) => (
+    count + (igsRows[page.id] ?? []).filter((row) => row.ideas.trim()).length
+  ), 0);
+  const prioritizedIgsIdeaCount = IGS_PAGES.reduce((count, page) => (
+    count + (igsRows[page.id] ?? []).filter((row) => Number(calculateIgsPrioritization(row)) >= 15).length
+  ), 0);
   const syncStatusLabel = {
     idle: 'Ready',
     loading: 'Pulling',
@@ -525,11 +666,14 @@ export function Admin() {
   const applySharedState = (state: SharedAdminState) => {
     const nextUpdates = normalizeProjectUpdates(state.projectUpdates);
     const nextKpiRows = state.kpiRows?.length ? state.kpiRows : EASA_KPI_DEFAULT_ROWS;
+    const nextIgsRows = normalizeIgsRows(state.igsRows);
 
     setUpdates(nextUpdates);
     setKpiRows(nextKpiRows);
+    setIgsRows(nextIgsRows);
     saveUpdates(nextUpdates);
     saveKpiRows(nextKpiRows);
+    saveIgsRows(nextIgsRows);
     setRemoteUpdatedAt(formatRemoteTimestamp(state.updatedAt));
   };
 
@@ -558,7 +702,8 @@ export function Admin() {
   const persistSharedAdminState = async (
     nextUpdates: AdminProjectUpdates,
     nextKpiRows: EasaKpiRow[],
-    options: { projectTitle?: string; isKpiSave?: boolean } = {},
+    nextIgsRows: IgsRowsByPage,
+    options: { projectTitle?: string; isKpiSave?: boolean; isIgsSave?: boolean } = {},
   ) => {
     if (!githubToken.trim()) {
       setSyncStatus('local');
@@ -577,12 +722,13 @@ export function Admin() {
             ...remoteUpdates,
             [options.projectTitle]: nextUpdates[options.projectTitle],
           }
-        : options.isKpiSave
+        : options.isKpiSave || options.isIgsSave
           ? remoteUpdates
           : nextUpdates;
       const sharedState = createSharedAdminState(
         projectUpdates,
         options.isKpiSave ? nextKpiRows : latest.state.kpiRows?.length ? latest.state.kpiRows : nextKpiRows,
+        options.isIgsSave ? nextIgsRows : normalizeIgsRows(latest.state.igsRows),
       );
       const saved = await saveSharedAdminState(githubToken, latest.sha || sharedSha, sharedState);
 
@@ -647,7 +793,7 @@ export function Admin() {
     setUpdates(nextUpdates);
     saveUpdates(nextUpdates);
     setLastSaved(saveStamp.savedAt);
-    void persistSharedAdminState(nextUpdates, kpiRows, { projectTitle });
+    void persistSharedAdminState(nextUpdates, kpiRows, igsRows, { projectTitle });
   };
 
   const handleSave = (projectTitle?: string) => {
@@ -674,7 +820,7 @@ export function Admin() {
     setUpdates(nextUpdates);
     saveUpdates(nextUpdates);
     setLastSaved(saveStamp.savedAt);
-    void persistSharedAdminState(nextUpdates, kpiRows, { projectTitle });
+    void persistSharedAdminState(nextUpdates, kpiRows, igsRows, { projectTitle });
   };
 
   const handleKpiCellUpdate = (rowIndex: number, column: string, value: string) => {
@@ -688,14 +834,70 @@ export function Admin() {
 
     saveKpiRows(kpiRows);
     setKpiLastSaved(savedAt);
-    void persistSharedAdminState(updates, kpiRows, { isKpiSave: true });
+    void persistSharedAdminState(updates, kpiRows, igsRows, { isKpiSave: true });
   };
 
   const handleResetKpiRows = () => {
     setKpiRows(EASA_KPI_DEFAULT_ROWS);
     saveKpiRows(EASA_KPI_DEFAULT_ROWS);
     setKpiLastSaved('Reset to Excel template');
-    void persistSharedAdminState(updates, EASA_KPI_DEFAULT_ROWS, { isKpiSave: true });
+    void persistSharedAdminState(updates, EASA_KPI_DEFAULT_ROWS, igsRows, { isKpiSave: true });
+  };
+
+  const handleIgsCellUpdate = (page: IgsPage, rowIndex: number, field: keyof IgsRow, value: string) => {
+    setIgsRows((currentRows) => ({
+      ...currentRows,
+      [page]: (currentRows[page] ?? []).map((row, index) => (
+        index === rowIndex ? { ...row, [field]: field === 'feasibility' || field === 'impact' ? normalizeIgsScore(value) : value } : row
+      )),
+    }));
+  };
+
+  const handleAddIgsRow = (page: IgsPage) => {
+    setIgsRows((currentRows) => ({
+      ...currentRows,
+      [page]: [...(currentRows[page] ?? []), createBlankIgsRow()],
+    }));
+  };
+
+  const handleDeleteIgsRow = (page: IgsPage, rowIndex: number) => {
+    setIgsRows((currentRows) => {
+      const nextRows = (currentRows[page] ?? []).filter((_, index) => index !== rowIndex);
+
+      return {
+        ...currentRows,
+        [page]: nextRows.length ? nextRows : [createBlankIgsRow()],
+      };
+    });
+  };
+
+  const handleSaveIgsRows = () => {
+    const { savedAt } = createSaveStamp();
+
+    saveIgsRows(igsRows);
+    setIgsLastSaved(savedAt);
+    void persistSharedAdminState(updates, kpiRows, igsRows, { isIgsSave: true });
+  };
+
+  const handleExportIgsExcel = () => {
+    setExportError('');
+
+    try {
+      const blob = new Blob([createIgsExcelXml(igsRows)], {
+        type: 'application/vnd.ms-excel;charset=utf-8;',
+      });
+      const downloadUrl = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+
+      link.href = downloadUrl;
+      link.download = `EASA-IGS-ideas-${new Date().toISOString().slice(0, 10)}.xls`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(downloadUrl);
+    } catch {
+      setExportError('IGS Excel export failed. Please try again.');
+    }
   };
 
   const handleExportPowerPoint = async () => {
@@ -870,6 +1072,7 @@ export function Admin() {
               {[
                 { id: 'project-update' as const, label: 'Project Update', icon: ShieldCheck },
                 { id: 'kpi' as const, label: 'KPI', icon: BarChart3 },
+                { id: 'igs' as const, label: 'IGS', icon: Lightbulb },
               ].map((page) => {
                 const Icon = page.icon;
                 const isActive = activeAdminPage === page.id;
@@ -1323,7 +1526,7 @@ export function Admin() {
               </div>
             )}
               </>
-            ) : (
+            ) : activeAdminPage === 'kpi' ? (
               <div className="space-y-6">
                 <div className="glass-panel p-6">
                   <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
@@ -1560,6 +1763,166 @@ export function Admin() {
                     )}
                   </div>
                 )}
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div className="glass-panel p-6">
+                  <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                    <div>
+                      <span className="text-xs font-bold uppercase tracking-[0.25em] text-electric-cyan">Idea Generation System</span>
+                      <h3 className="mt-2 text-2xl font-black text-white">IGS Workspace</h3>
+                      <p className="mt-2 text-sm text-slate-400">
+                        Capture station ideas, score feasibility and impact, then download the IGS register as an Excel file.
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-3">
+                      {igsLastSaved && <span className="text-xs text-slate-400">Saved {igsLastSaved}</span>}
+                      <button type="button" onClick={handleSaveIgsRows} className="btn-primary inline-flex items-center gap-2">
+                        <Save className="h-4 w-4" aria-hidden="true" />
+                        Save IGS
+                      </button>
+                      <button type="button" onClick={handleExportIgsExcel} className="btn-primary inline-flex items-center gap-2">
+                        <FileDown className="h-4 w-4" aria-hidden="true" />
+                        Download Excel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                {exportError && <p className="text-sm font-medium text-orange-300">{exportError}</p>}
+
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                  {[
+                    { label: 'Total Ideas', value: filledIgsIdeaCount, tone: 'text-white' },
+                    { label: 'High Priority', value: prioritizedIgsIdeaCount, tone: 'text-accent-green' },
+                    { label: 'Stations', value: IGS_PAGES.length, tone: 'text-electric-cyan' },
+                    { label: `${activeIgsStation.label} Ideas`, value: activeIgsIdeaCount, tone: 'text-sky-300' },
+                  ].map((metric) => (
+                    <div key={metric.label} className="glass-card p-5">
+                      <div className={`text-4xl font-black ${metric.tone}`}>{metric.value}</div>
+                      <div className="mt-2 text-xs font-bold uppercase tracking-widest text-slate-400">{metric.label}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="inline-flex rounded-xl border border-electric-cyan/20 bg-navy-900/55 p-1">
+                  {IGS_PAGES.map((page) => (
+                    <button
+                      key={page.id}
+                      type="button"
+                      onClick={() => setActiveIgsPage(page.id)}
+                      className={`rounded-lg px-5 py-3 text-sm font-bold transition ${
+                        activeIgsPage === page.id
+                          ? 'bg-electric-cyan/15 text-electric-cyan shadow-[0_0_18px_rgba(93,244,255,0.2)]'
+                          : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                      }`}
+                    >
+                      {page.label}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="glass-panel flex flex-col gap-4 p-5 lg:flex-row lg:items-center lg:justify-between">
+                  <div>
+                    <h4 className="text-xl font-bold text-white">{activeIgsStation.label} Idea Register</h4>
+                    <p className="mt-1 text-sm text-slate-400">Feasibility and Impact use a 1 to 5 scoring dropdown. Prioritization is calculated automatically.</p>
+                  </div>
+                  <button type="button" onClick={() => handleAddIgsRow(activeIgsPage)} className="btn-secondary inline-flex items-center gap-2">
+                    <Plus className="h-4 w-4" aria-hidden="true" />
+                    Add Row
+                  </button>
+                </div>
+
+                <div className="overflow-x-auto rounded-xl border border-electric-cyan/15 bg-navy-900/45 shadow-2xl shadow-black/20">
+                  <table className="min-w-[1280px] w-full border-collapse text-left">
+                    <thead className="bg-navy-800/90 text-xs uppercase tracking-widest text-electric-cyan">
+                      <tr>
+                        <th className="w-24 px-4 py-4">No.</th>
+                        <th className="w-[32rem] px-4 py-4">Ideas</th>
+                        <th className="w-56 px-4 py-4">Station PIC</th>
+                        <th className="w-56 px-4 py-4">EASA PIC</th>
+                        <th className="w-40 px-4 py-4">Feasibility</th>
+                        <th className="w-40 px-4 py-4">Impact</th>
+                        <th className="w-44 px-4 py-4">Prioritization</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {activeIgsRows.map((row, rowIndex) => {
+                        const prioritization = calculateIgsPrioritization(row);
+                        const prioritizationScore = Number(prioritization);
+                        const prioritizationClassName = prioritizationScore >= 20
+                          ? 'border-accent-green/35 bg-accent-green/10 text-accent-green'
+                          : prioritizationScore >= 15
+                            ? 'border-orange-300/35 bg-orange-300/10 text-orange-200'
+                            : 'border-white/10 bg-navy-900/70 text-slate-400';
+
+                        return (
+                          <tr key={`${activeIgsPage}-${rowIndex}`} className="border-t border-white/10 align-top odd:bg-white/[0.025] hover:bg-electric-cyan/[0.035]">
+                            <td className="px-4 py-4">
+                              <div className="flex items-center gap-3">
+                                <span className="text-sm font-bold text-slate-400">{rowIndex + 1}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteIgsRow(activeIgsPage, rowIndex)}
+                                  className="rounded-lg border border-white/10 bg-white/5 p-2 text-slate-400 transition hover:border-orange-300/40 hover:text-orange-200"
+                                  aria-label={`Delete ${activeIgsStation.label} IGS row ${rowIndex + 1}`}
+                                  title="Delete row"
+                                >
+                                  <Trash2 className="h-4 w-4" aria-hidden="true" />
+                                </button>
+                              </div>
+                            </td>
+                            <td className="px-4 py-4">
+                              <textarea
+                                value={row.ideas}
+                                onChange={(event) => handleIgsCellUpdate(activeIgsPage, rowIndex, 'ideas', event.target.value)}
+                                className="min-h-28 w-full resize-y rounded-lg border border-white/10 bg-navy-900/80 p-3 text-sm leading-relaxed text-white outline-none transition placeholder:text-slate-500 focus:border-electric-cyan focus:ring-2 focus:ring-electric-cyan/25"
+                                placeholder="Enter idea"
+                              />
+                            </td>
+                            <td className="px-4 py-4">
+                              <input
+                                value={row.stationPic}
+                                onChange={(event) => handleIgsCellUpdate(activeIgsPage, rowIndex, 'stationPic', event.target.value)}
+                                className="w-full rounded-lg border border-white/10 bg-navy-900/80 px-3 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-electric-cyan focus:ring-2 focus:ring-electric-cyan/25"
+                                placeholder="Station PIC"
+                              />
+                            </td>
+                            <td className="px-4 py-4">
+                              <input
+                                value={row.easaPic}
+                                onChange={(event) => handleIgsCellUpdate(activeIgsPage, rowIndex, 'easaPic', event.target.value)}
+                                className="w-full rounded-lg border border-white/10 bg-navy-900/80 px-3 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-electric-cyan focus:ring-2 focus:ring-electric-cyan/25"
+                                placeholder="EASA PIC"
+                              />
+                            </td>
+                            {(['feasibility', 'impact'] as const).map((field) => (
+                              <td key={field} className="px-4 py-4">
+                                <select
+                                  value={row[field]}
+                                  onChange={(event) => handleIgsCellUpdate(activeIgsPage, rowIndex, field, event.target.value)}
+                                  className="w-full rounded-lg border border-electric-cyan/25 bg-navy-900/80 px-3 py-3 text-sm font-bold text-electric-cyan outline-none transition focus:border-electric-cyan focus:ring-2 focus:ring-electric-cyan/25"
+                                  aria-label={`${field} score for ${activeIgsStation.label} IGS row ${rowIndex + 1}`}
+                                >
+                                  <option value="" className="bg-navy-900 text-white">Select</option>
+                                  {IGS_SCORE_OPTIONS.map((score) => (
+                                    <option key={score} value={score} className="bg-navy-900 text-white">
+                                      {score}
+                                    </option>
+                                  ))}
+                                </select>
+                              </td>
+                            ))}
+                            <td className="px-4 py-4">
+                              <div className={`rounded-lg border px-4 py-3 text-center text-lg font-black ${prioritizationClassName}`}>
+                                {prioritization || '-'}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
           </motion.div>
