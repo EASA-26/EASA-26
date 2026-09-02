@@ -335,6 +335,17 @@ const normalizeIgsRows = (savedRows?: Partial<Record<IgsPage, IgsRow[]>>): IgsRo
   }, {} as IgsRowsByPage);
 };
 
+const hasMeaningfulIgsRows = (rows?: Partial<Record<IgsPage, Partial<IgsRow>[]>>) =>
+  Boolean(IGS_PAGES.some((page) => (
+    rows?.[page.id]?.some((row) => (
+      (row.ideas ?? '').trim()
+      || (row.stationPic ?? '').trim()
+      || (row.easaPic ?? '').trim()
+      || row.feasibility
+      || row.impact
+    ))
+  )));
+
 const calculateIgsPrioritization = (row: IgsRow) => {
   const feasibility = Number(row.feasibility);
   const impact = Number(row.impact);
@@ -666,7 +677,8 @@ export function Admin() {
   const applySharedState = (state: SharedAdminState) => {
     const nextUpdates = normalizeProjectUpdates(state.projectUpdates);
     const nextKpiRows = state.kpiRows?.length ? state.kpiRows : EASA_KPI_DEFAULT_ROWS;
-    const nextIgsRows = normalizeIgsRows(state.igsRows);
+    const shouldKeepLocalIgsRows = hasMeaningfulIgsRows(igsRows) && !hasMeaningfulIgsRows(state.igsRows);
+    const nextIgsRows = shouldKeepLocalIgsRows ? igsRows : normalizeIgsRows(state.igsRows);
 
     setUpdates(nextUpdates);
     setKpiRows(nextKpiRows);
@@ -745,6 +757,10 @@ export function Admin() {
   useEffect(() => {
     saveGithubToken(githubToken);
   }, [githubToken]);
+
+  useEffect(() => {
+    saveIgsRows(igsRows);
+  }, [igsRows]);
 
   const handleUnlock = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
