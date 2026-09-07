@@ -152,22 +152,98 @@
     animation: ai-avatar-spin 11s linear infinite reverse;
   }
 
+  /* Interactive portrait: the frame is a button, so give it a focus ring. */
+  .ai-avatar-frame.is-interactive {
+    @apply cursor-pointer;
+  }
+
+  .ai-avatar-frame.is-interactive:focus-visible {
+    @apply outline-none;
+  }
+
+  .ai-avatar-frame.is-interactive:focus-visible::before {
+    border-color: rgba(120, 214, 75, 0.95);
+    box-shadow: 0 0 26px rgba(120, 214, 75, 0.55), inset 0 0 18px rgba(120, 214, 75, 0.2);
+  }
+
+  /* The stage carries the head motion. The jaw layer nests inside it so the two
+     transforms compose instead of one overwriting the other. */
+  .ai-portrait-stage {
+    @apply relative h-full w-full rounded-full;
+    transform-origin: 50% 58%;
+    animation: ai-portrait-motion 6.2s ease-in-out infinite;
+  }
+
+  .ai-portrait-stage.is-speaking {
+    animation: ai-portrait-speaking 2.1s ease-in-out infinite;
+  }
+
   .ai-avatar-image {
     @apply relative z-10 h-full w-full rounded-full border-2 border-electric-cyan/60 object-cover;
     box-shadow: 0 0 24px rgba(37, 216, 255, 0.28);
-    transform-origin: 50% 58%;
-    animation: ai-portrait-motion 6.2s ease-in-out infinite;
+  }
+
+  .ai-avatar-initials {
+    @apply relative z-10 flex h-full w-full items-center justify-center rounded-full border-2 border-electric-cyan/40 bg-electric-cyan/10 font-bold text-electric-cyan;
+    box-shadow: 0 0 24px rgba(37, 216, 255, 0.18);
+  }
+
+  /* A second copy of the photo, clipped to the jaw band. Scaling it vertically
+     reads as the mouth opening and closing. */
+  .ai-avatar-jaw {
+    @apply absolute inset-0 z-20 h-full w-full rounded-full object-cover;
+    border: 2px solid transparent;
+    clip-path: inset(56% 17% 10% 17% round 0 0 45% 45%);
+    transform-origin: 50% 56%;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .is-speaking .ai-avatar-jaw {
+    opacity: 1;
+    animation: ai-portrait-talk 420ms ease-in-out infinite;
   }
 
   .ai-avatar-shimmer {
     position: absolute;
     inset: 4px;
-    z-index: 11;
+    z-index: 25;
     border-radius: 9999px;
     background: linear-gradient(115deg, transparent 8%, rgba(93, 244, 255, 0.16) 38%, transparent 58%);
     mix-blend-mode: screen;
     pointer-events: none;
     animation: ai-portrait-shimmer 4.6s ease-in-out infinite;
+  }
+
+  /* Speech bubble */
+  .portrait-speech {
+    @apply relative rounded-2xl border border-electric-cyan/40 px-3.5 py-2.5 text-left text-[0.78rem] font-medium leading-snug text-slate-100 backdrop-blur-md;
+    background: rgba(12, 45, 85, 0.96);
+    box-shadow: 0 0 30px rgba(37, 216, 255, 0.25), 0 8px 24px rgba(0, 0, 0, 0.45);
+  }
+
+  .portrait-speech::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -6px;
+    height: 11px;
+    width: 11px;
+    transform: translateX(-50%) rotate(45deg);
+    background: rgba(12, 45, 85, 0.96);
+    border-right: 1px solid rgba(93, 244, 255, 0.4);
+    border-bottom: 1px solid rgba(93, 244, 255, 0.4);
+  }
+
+  /* Left-anchored bubble: point the tail at the middle of the 5rem frame. */
+  .portrait-speech--start::after {
+    left: 2.5rem;
+  }
+
+  .portrait-speech-caret {
+    @apply ml-0.5 inline-block w-[2px] self-stretch bg-electric-cyan align-middle;
+    height: 0.85em;
+    animation: portrait-caret 900ms steps(2, end) infinite;
   }
 
   @keyframes ai-avatar-float {
@@ -208,6 +284,54 @@
     }
   }
 
+  /* Livelier head movement while a portrait is talking. */
+  @keyframes ai-portrait-speaking {
+    0%,
+    100% {
+      filter: brightness(1.07) saturate(1.1);
+      transform: translate3d(0, 0, 0) rotate(0deg) scale(1.03);
+    }
+    22% {
+      transform: translate3d(1.4px, -2px, 0) rotate(-1.7deg) scale(1.045);
+    }
+    45% {
+      filter: brightness(1.13) saturate(1.14);
+      transform: translate3d(-1.4px, 1px, 0) rotate(1.3deg) scale(1.035);
+    }
+    68% {
+      transform: translate3d(1.6px, 1.4px, 0) rotate(1.5deg) scale(1.05);
+    }
+    86% {
+      transform: translate3d(-0.8px, -1px, 0) rotate(-0.8deg) scale(1.038);
+    }
+  }
+
+  @keyframes ai-portrait-talk {
+    0%,
+    100% {
+      transform: scaleY(1) translateY(0);
+    }
+    28% {
+      transform: scaleY(1.09) translateY(0.7px);
+    }
+    52% {
+      transform: scaleY(0.95) translateY(-0.4px);
+    }
+    76% {
+      transform: scaleY(1.055) translateY(0.4px);
+    }
+  }
+
+  @keyframes portrait-caret {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+
   @keyframes ai-portrait-shimmer {
     0%,
     100% {
@@ -220,6 +344,23 @@
     70% {
       opacity: 0;
       transform: translateX(26%) rotate(-10deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ai-avatar-frame,
+    .ai-avatar-frame::before,
+    .ai-avatar-frame::after,
+    .ai-portrait-stage,
+    .ai-portrait-stage.is-speaking,
+    .ai-avatar-shimmer,
+    .is-speaking .ai-avatar-jaw,
+    .portrait-speech-caret {
+      animation: none !important;
+    }
+
+    .ai-avatar-jaw {
+      opacity: 0 !important;
     }
   }
 

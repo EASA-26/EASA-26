@@ -1,14 +1,31 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import { ChevronDown, UserRound, UsersRound } from 'lucide-react';
+import { ChevronDown, Sparkles, UserRound, UsersRound, Volume2, VolumeX } from 'lucide-react';
 import { orgStructureData, rizalSubordinateData } from '../../data/content';
-import { motion } from 'framer-motion';
+import { motion, useInView, useReducedMotion } from 'framer-motion';
+import { TalkingPortrait } from '../TalkingPortrait';
 
 type OrgMember = (typeof orgStructureData)[number];
 type RizalSubordinate = (typeof rizalSubordinateData)[number];
 
-function OrgCard({ member, featured = false, delay = 0, action }: { member: OrgMember; featured?: boolean; delay?: number; action?: ReactNode }) {
-  const photoSrc = member.photo ? `${import.meta.env.BASE_URL}${member.photo}` : undefined;
+const AMBIENT_INTERVAL_MS = 7000;
+
+function OrgCard({
+  member,
+  featured = false,
+  delay = 0,
+  action,
+  voice,
+  ambientToken = 0,
+}: {
+  member: OrgMember;
+  featured?: boolean;
+  delay?: number;
+  action?: ReactNode;
+  voice: boolean;
+  ambientToken?: number;
+}) {
+  const [talking, setTalking] = useState(false);
 
   return (
     <motion.div
@@ -16,18 +33,19 @@ function OrgCard({ member, featured = false, delay = 0, action }: { member: OrgM
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.5, delay }}
-      className={`glass-card relative z-10 w-full p-6 text-center ${featured ? 'border-electric-blue border-b-4 md:max-w-xl' : ''}`}
+      className={`glass-card relative w-full p-6 text-center ${talking ? 'z-30' : 'z-10'} ${featured ? 'border-electric-blue border-b-4 md:max-w-xl' : ''}`}
     >
-      {photoSrc && (
-        <div className="ai-avatar-frame mx-auto mb-5">
-          <img
-            src={photoSrc}
-            alt={member.name}
-            className="ai-avatar-image"
-          />
-          <span className="ai-avatar-shimmer" />
-        </div>
-      )}
+      <div className="mx-auto mb-5 flex justify-center">
+        <TalkingPortrait
+          name={member.name}
+          photo={member.photo}
+          lines={member.lines}
+          voice={voice}
+          ambientToken={ambientToken}
+          onSpeakingChange={setTalking}
+          initialsClassName="text-2xl"
+        />
+      </div>
       <h3 className={`${featured ? 'text-xl' : 'text-lg'} font-bold text-white mb-1 break-words`}>{member.role}</h3>
       <p className="text-electric-cyan text-sm font-medium mb-3 break-words">{member.name}</p>
       <p className="text-slate-400 text-sm mb-4">{member.responsibility}</p>
@@ -49,20 +67,19 @@ function CompactOrgCard({
   onToggle,
   locked = false,
   delay = 0,
+  voice,
+  ambientToken = 0,
 }: {
   member: OrgMember | RizalSubordinate;
   expanded: boolean;
   onToggle?: () => void;
   locked?: boolean;
   delay?: number;
+  voice: boolean;
+  ambientToken?: number;
 }) {
-  const photoSrc = 'photo' in member && member.photo ? `${import.meta.env.BASE_URL}${member.photo}` : undefined;
-  const initials = member.name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join('');
+  const [talking, setTalking] = useState(false);
+  const photo = 'photo' in member ? member.photo : undefined;
 
   return (
     <motion.div
@@ -70,23 +87,21 @@ function CompactOrgCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.5, delay }}
-      className={`glass-card relative z-10 w-full overflow-hidden p-5 text-left transition-all ${locked ? 'border-accent-green/35 shadow-[0_0_28px_rgba(120,214,75,0.16)]' : ''}`}
+      className={`glass-card relative w-full p-5 text-left transition-all ${talking ? 'z-30' : 'z-10'} ${locked ? 'border-accent-green/35 shadow-[0_0_28px_rgba(120,214,75,0.16)]' : ''}`}
     >
       <div className="flex items-start gap-4">
-        {photoSrc ? (
-          <div className="ai-avatar-frame shrink-0" style={{ width: '5rem', height: '5rem' }}>
-            <img
-              src={photoSrc}
-              alt={member.name}
-              className="ai-avatar-image"
-            />
-            <span className="ai-avatar-shimmer" />
-          </div>
-        ) : (
-          <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-electric-cyan/35 bg-electric-cyan/10 text-lg font-bold text-electric-cyan shadow-[0_0_18px_rgba(37,216,255,0.14)]">
-            {initials}
-          </span>
-        )}
+        <div className="shrink-0">
+          <TalkingPortrait
+            name={member.name}
+            photo={photo}
+            lines={member.lines}
+            voice={voice}
+            ambientToken={ambientToken}
+            onSpeakingChange={setTalking}
+            bubbleAlign="start"
+            frameStyle={{ width: '5rem', height: '5rem' }}
+          />
+        </div>
 
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
@@ -130,6 +145,12 @@ export function OrgStructure() {
   const [chiefEngineer, lead, platformManager, applicationManager, dataEngineer, protegeDataEngineer, devOpsEngineer] = orgStructureData;
   const [showRizalReports, setShowRizalReports] = useState(false);
   const [expandedReports, setExpandedReports] = useState<Record<string, boolean>>({});
+  const [voice, setVoice] = useState(false);
+
+  const sectionRef = useRef<HTMLElement>(null);
+  const inView = useInView(sectionRef, { amount: 0.15 });
+  const reduceMotion = useReducedMotion();
+
   const visibleRizalReports: Array<OrgMember | RizalSubordinate> = showRizalReports
     ? [rizalSubordinateData[0], rizalSubordinateData[1], lead, rizalSubordinateData[2], rizalSubordinateData[3]]
     : [lead];
@@ -140,8 +161,38 @@ export function OrgStructure() {
     }));
   };
 
+  // Every portrait currently on screen is a candidate for ambient muttering.
+  const ambientPool = useMemo(
+    () =>
+      [
+        chiefEngineer,
+        ...visibleRizalReports,
+        platformManager,
+        applicationManager,
+        dataEngineer,
+        protegeDataEngineer,
+        devOpsEngineer,
+      ].map((member) => member.name),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [showRizalReports],
+  );
+
+  // One portrait at a time speaks up on its own, the way the frames do in a
+  // wizarding portrait gallery. Silent — only hover or click speaks out loud.
+  const [ambient, setAmbient] = useState({ name: '', token: 0 });
+  useEffect(() => {
+    if (!inView || reduceMotion || ambientPool.length === 0) return;
+    const id = window.setInterval(() => {
+      const pick = ambientPool[Math.floor(Math.random() * ambientPool.length)];
+      setAmbient((current) => ({ name: pick, token: current.token + 1 }));
+    }, AMBIENT_INTERVAL_MS);
+    return () => window.clearInterval(id);
+  }, [inView, reduceMotion, ambientPool]);
+
+  const ambientFor = (name: string) => (ambient.name === name ? ambient.token : 0);
+
   return (
-    <section id="org-structure" className="section-container">
+    <section id="org-structure" className="section-container" ref={sectionRef}>
       <div className="max-w-6xl mx-auto w-full">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -151,6 +202,31 @@ export function OrgStructure() {
         >
           <span className="section-subtitle">Team</span>
           <h2 className="section-title">Org Structure</h2>
+
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <span className="inline-flex items-center gap-2 rounded-full border border-electric-cyan/25 bg-electric-cyan/5 px-3.5 py-1.5 text-xs text-slate-300">
+              <Sparkles className="h-3.5 w-3.5 text-electric-cyan" aria-hidden="true" />
+              The portraits talk. Hover or tap one to hear from them.
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                if (voice && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+                  window.speechSynthesis.cancel();
+                }
+                setVoice((current) => !current);
+              }}
+              aria-pressed={voice}
+              className={`inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider transition ${
+                voice
+                  ? 'border-accent-green/45 bg-accent-green/15 text-accent-green shadow-[0_0_18px_rgba(120,214,75,0.28)]'
+                  : 'border-white/15 bg-white/5 text-slate-400 hover:border-electric-cyan/35 hover:text-electric-cyan'
+              }`}
+            >
+              {voice ? <Volume2 className="h-4 w-4" aria-hidden="true" /> : <VolumeX className="h-4 w-4" aria-hidden="true" />}
+              <span>{voice ? 'Voice on' : 'Voice off'}</span>
+            </button>
+          </div>
         </motion.div>
 
         <div className="mt-12">
@@ -159,6 +235,8 @@ export function OrgStructure() {
               <OrgCard
                 member={chiefEngineer}
                 featured
+                voice={voice}
+                ambientToken={ambientFor(chiefEngineer.name)}
                 action={
                   <button
                     type="button"
@@ -211,6 +289,8 @@ export function OrgStructure() {
                       locked={member.name === lead.name}
                       onToggle={() => toggleReport(member.name)}
                       delay={0.05 + (index * 0.05)}
+                      voice={voice}
+                      ambientToken={ambientFor(member.name)}
                     />
                   </div>
                 ))}
@@ -219,7 +299,7 @@ export function OrgStructure() {
               <div className="mx-auto max-w-xl pt-16">
                 <div className="relative">
                   <div className="hidden md:block absolute -top-16 left-1/2 h-16 w-1 -translate-x-1/2 rounded-full bg-accent-green shadow-[0_0_18px_rgba(120,214,75,0.65)]" />
-                  <OrgCard member={lead} featured delay={0.05} />
+                  <OrgCard member={lead} featured delay={0.05} voice={voice} ambientToken={ambientFor(lead.name)} />
                 </div>
               </div>
             )}
@@ -236,18 +316,18 @@ export function OrgStructure() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 max-w-4xl mx-auto md:mt-10">
             <div className="relative flex flex-col items-center">
               <div className="hidden md:block absolute -top-10 left-1/2 h-10 w-0.5 -translate-x-1/2 bg-electric-cyan/70 shadow-[0_0_10px_rgba(0,229,255,0.35)]" />
-              <OrgCard member={platformManager} delay={0.1} />
+              <OrgCard member={platformManager} delay={0.1} voice={voice} ambientToken={ambientFor(platformManager.name)} />
               <div className="hidden md:block h-10 w-0.5 bg-electric-cyan/70 shadow-[0_0_10px_rgba(0,229,255,0.35)]" />
-              <OrgCard member={dataEngineer} delay={0.2} />
+              <OrgCard member={dataEngineer} delay={0.2} voice={voice} ambientToken={ambientFor(dataEngineer.name)} />
               <div className="hidden md:block h-10 w-0.5 bg-electric-cyan/70 shadow-[0_0_10px_rgba(0,229,255,0.35)]" />
-              <OrgCard member={protegeDataEngineer} delay={0.3} />
+              <OrgCard member={protegeDataEngineer} delay={0.3} voice={voice} ambientToken={ambientFor(protegeDataEngineer.name)} />
             </div>
 
             <div className="relative flex flex-col items-center">
               <div className="hidden md:block absolute -top-10 left-1/2 h-10 w-0.5 -translate-x-1/2 bg-electric-cyan/70 shadow-[0_0_10px_rgba(0,229,255,0.35)]" />
-              <OrgCard member={applicationManager} delay={0.15} />
+              <OrgCard member={applicationManager} delay={0.15} voice={voice} ambientToken={ambientFor(applicationManager.name)} />
               <div className="hidden md:block h-10 w-0.5 bg-electric-cyan/70 shadow-[0_0_10px_rgba(0,229,255,0.35)]" />
-              <OrgCard member={devOpsEngineer} delay={0.25} />
+              <OrgCard member={devOpsEngineer} delay={0.25} voice={voice} ambientToken={ambientFor(devOpsEngineer.name)} />
             </div>
           </div>
         </div>
