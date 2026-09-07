@@ -193,15 +193,18 @@
   .ai-avatar-jaw {
     @apply absolute inset-0 z-20 h-full w-full rounded-full object-cover;
     border: 2px solid transparent;
-    clip-path: inset(56% 17% 10% 17% round 0 0 45% 45%);
-    transform-origin: 50% 56%;
+    /* A feathered mask, not a hard clip: the edges of the moving copy fade into
+       the still photo underneath, so no seam or double chin shows up. */
+    -webkit-mask-image: radial-gradient(ellipse 46% 30% at 50% 72%, #000 30%, transparent 72%);
+    mask-image: radial-gradient(ellipse 46% 30% at 50% 72%, #000 30%, transparent 72%);
+    transform-origin: 50% 58%;
     opacity: 0;
     pointer-events: none;
   }
 
   .is-speaking .ai-avatar-jaw {
     opacity: 1;
-    animation: ai-portrait-talk 420ms ease-in-out infinite;
+    animation: ai-portrait-talk 440ms ease-in-out infinite;
   }
 
   .ai-avatar-shimmer {
@@ -217,22 +220,29 @@
 
   /* Speech bubble */
   .portrait-speech {
-    @apply relative rounded-2xl border border-electric-cyan/40 px-3.5 py-2.5 text-left text-[0.78rem] font-medium leading-snug text-slate-100 backdrop-blur-md;
-    background: rgba(12, 45, 85, 0.96);
-    box-shadow: 0 0 30px rgba(37, 216, 255, 0.25), 0 8px 24px rgba(0, 0, 0, 0.45);
+    @apply relative rounded-[1.15rem] border border-electric-cyan/20 px-4 py-2.5 text-left text-[0.76rem] leading-relaxed text-slate-200 backdrop-blur-xl;
+    background: linear-gradient(150deg, rgba(24, 78, 122, 0.8), rgba(11, 40, 76, 0.9));
+    /* Depth from a soft drop shadow rather than a bright glow, so it reads as
+       floating over the card instead of fighting it. */
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.07),
+      0 16px 34px -14px rgba(0, 0, 0, 0.85),
+      0 0 20px rgba(37, 216, 255, 0.09);
+    text-wrap: pretty;
   }
 
   .portrait-speech::after {
     content: '';
     position: absolute;
     left: 50%;
-    bottom: -6px;
-    height: 11px;
-    width: 11px;
+    bottom: -5px;
+    height: 10px;
+    width: 10px;
     transform: translateX(-50%) rotate(45deg);
-    background: rgba(12, 45, 85, 0.96);
-    border-right: 1px solid rgba(93, 244, 255, 0.4);
-    border-bottom: 1px solid rgba(93, 244, 255, 0.4);
+    border-bottom-right-radius: 3px;
+    background: rgba(11, 40, 76, 0.93);
+    border-right: 1px solid rgba(93, 244, 255, 0.18);
+    border-bottom: 1px solid rgba(93, 244, 255, 0.18);
   }
 
   /* Left-anchored bubble: point the tail at the middle of the 5rem frame. */
@@ -288,21 +298,21 @@
   @keyframes ai-portrait-speaking {
     0%,
     100% {
-      filter: brightness(1.07) saturate(1.1);
-      transform: translate3d(0, 0, 0) rotate(0deg) scale(1.03);
+      filter: brightness(1.04) saturate(1.05);
+      transform: translate3d(0, 0, 0) rotate(0deg) scale(1.014);
     }
-    22% {
-      transform: translate3d(1.4px, -2px, 0) rotate(-1.7deg) scale(1.045);
+    24% {
+      transform: translate3d(0.6px, -0.9px, 0) rotate(-0.55deg) scale(1.02);
     }
-    45% {
-      filter: brightness(1.13) saturate(1.14);
-      transform: translate3d(-1.4px, 1px, 0) rotate(1.3deg) scale(1.035);
+    48% {
+      filter: brightness(1.07) saturate(1.08);
+      transform: translate3d(-0.6px, 0.5px, 0) rotate(0.45deg) scale(1.016);
     }
-    68% {
-      transform: translate3d(1.6px, 1.4px, 0) rotate(1.5deg) scale(1.05);
+    72% {
+      transform: translate3d(0.7px, 0.6px, 0) rotate(0.5deg) scale(1.022);
     }
-    86% {
-      transform: translate3d(-0.8px, -1px, 0) rotate(-0.8deg) scale(1.038);
+    88% {
+      transform: translate3d(-0.4px, -0.4px, 0) rotate(-0.3deg) scale(1.017);
     }
   }
 
@@ -311,14 +321,14 @@
     100% {
       transform: scaleY(1) translateY(0);
     }
-    28% {
-      transform: scaleY(1.09) translateY(0.7px);
+    30% {
+      transform: scaleY(1.045) translateY(0.6px);
     }
-    52% {
-      transform: scaleY(0.95) translateY(-0.4px);
+    56% {
+      transform: scaleY(0.985) translateY(-0.3px);
     }
-    76% {
-      transform: scaleY(1.055) translateY(0.4px);
+    80% {
+      transform: scaleY(1.025) translateY(0.3px);
     }
   }
 

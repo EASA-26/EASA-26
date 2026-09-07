@@ -156,11 +156,13 @@ export function TalkingPortrait({
       <AnimatePresence>
         {speaking && (
           <motion.div
-            initial={{ opacity: 0, y: 8, scale: 0.94 }}
+            initial={{ opacity: 0, y: 6, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 6, scale: 0.96 }}
-            transition={{ duration: 0.22, ease: 'easeOut' }}
-            className={`pointer-events-none absolute bottom-full z-40 mb-4 w-[15rem] max-w-[70vw] ${
+            exit={{ opacity: 0, y: 4, scale: 0.94 }}
+            transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
+            // Grow out of the portrait's mouth rather than out of thin air.
+            style={{ transformOrigin: bubbleAlign === 'start' ? '2.5rem 100%' : '50% 100%' }}
+            className={`pointer-events-none absolute bottom-full z-40 mb-8 w-[15rem] max-w-[70vw] ${
               bubbleAlign === 'start' ? 'left-0' : 'left-1/2 -translate-x-1/2'
             }`}
           >
