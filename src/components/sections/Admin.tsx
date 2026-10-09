@@ -392,14 +392,34 @@ const createSaveStamp = () => {
   };
 };
 
-const normalizeProjectUpdates = (savedUpdates: AdminProjectUpdates = {}) =>
-  projectHistoryData.projects.reduce<AdminProjectUpdates>((result, project) => {
+// Projects that have been retitled. Saved updates are keyed by title, and
+// normalising drops any key that is no longer a project, so without this a
+// rename would quietly reset that project's notes on the next save.
+const RENAMED_PROJECTS: Record<string, string> = {
+  FazuraGPT: 'HANA',
+};
+
+const applyProjectRenames = (savedUpdates: AdminProjectUpdates) => {
+  const carried: AdminProjectUpdates = { ...savedUpdates };
+  Object.entries(RENAMED_PROJECTS).forEach(([oldTitle, newTitle]) => {
+    if (carried[oldTitle] && !carried[newTitle]) {
+      carried[newTitle] = carried[oldTitle];
+    }
+    delete carried[oldTitle];
+  });
+  return carried;
+};
+
+const normalizeProjectUpdates = (savedUpdates: AdminProjectUpdates = {}) => {
+  const carried = applyProjectRenames(savedUpdates);
+  return projectHistoryData.projects.reduce<AdminProjectUpdates>((result, project) => {
     result[project.title] = {
       ...createDefaultUpdate(project),
-      ...savedUpdates[project.title],
+      ...carried[project.title],
     };
     return result;
   }, {});
+};
 
 const encodeBase64 = (value: string) => {
   const bytes = new TextEncoder().encode(value);
