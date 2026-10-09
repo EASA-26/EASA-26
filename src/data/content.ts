@@ -108,8 +108,8 @@ export const projectHistoryData = {
   },
   projects: [
     {
-      title: "FazuraGPT",
-      image: "fazuragpt-ui.png",
+      title: "HANA",
+      image: "hana-ui.png",
       problem: "Genco knowledge is distributed across RCA documents, project records, ISO references, policies, handbooks, guidelines, reports, and other controlled documents, making it difficult for employees to retrieve reliable answers quickly.",
       approach: "Genco Knowledge Hub using an AI LLM chatbot with retrieval-augmented generation, controlled document scope, classification filters, role-based access, and approved knowledge sources for Genco-only information.",
       stakeholders: "All Genco Employees",
