@@ -353,11 +353,16 @@ const calculateIgsPrioritization = (row: IgsRow) => {
   return feasibility && impact ? String(feasibility * impact) : '';
 };
 
+// Before the monthly updates were written into content.ts, the progress column
+// was filled with this generated summary. A saved copy of it means nobody ever
+// typed in that box, so a briefed default should still be allowed to win.
+const autoProgressSummary = (project: Project) => `${project.status}: ${project.value}`;
+
 const createDefaultUpdate = (project: Project): AdminProjectUpdate => ({
   isVisible: true,
   status: STATUS_OPTIONS.includes(project.status as StatusOption) ? project.status as StatusOption : 'Prototype',
-  currentProgress: `${project.status}: ${project.value}`,
-  wayForward: '',
+  currentProgress: project.currentProgress ?? autoProgressSummary(project),
+  wayForward: project.wayForward ?? '',
 });
 
 const getStatusColor = (status: StatusOption) => {
@@ -413,10 +418,22 @@ const applyProjectRenames = (savedUpdates: AdminProjectUpdates) => {
 const normalizeProjectUpdates = (savedUpdates: AdminProjectUpdates = {}) => {
   const carried = applyProjectRenames(savedUpdates);
   return projectHistoryData.projects.reduce<AdminProjectUpdates>((result, project) => {
-    result[project.title] = {
-      ...createDefaultUpdate(project),
-      ...carried[project.title],
-    };
+    const defaults = createDefaultUpdate(project);
+    const saved = carried[project.title];
+    const merged = { ...defaults, ...saved };
+
+    if (saved) {
+      // An empty box, or one still holding the generated summary, was never
+      // actually written in — so it must not shadow a newly briefed default.
+      if (!saved.currentProgress || saved.currentProgress === autoProgressSummary(project)) {
+        merged.currentProgress = defaults.currentProgress;
+      }
+      if (!saved.wayForward) {
+        merged.wayForward = defaults.wayForward;
+      }
+    }
+
+    result[project.title] = merged;
     return result;
   }, {});
 };

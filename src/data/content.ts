@@ -101,7 +101,7 @@ export const rizalSubordinateData = [
 
 export const projectHistoryData = {
   metrics: {
-    totalProjects: "17",
+    totalProjects: "19",
     activePilots: "12",
     deployedSolutions: "4",
     stakeholdersEngaged: "7"
@@ -114,7 +114,9 @@ export const projectHistoryData = {
       approach: "Genco Knowledge Hub using an AI LLM chatbot with retrieval-augmented generation, controlled document scope, classification filters, role-based access, and approved knowledge sources for Genco-only information.",
       stakeholders: "All Genco Employees",
       value: "Deployed as a ChatGPT-like internal knowledge assistant that helps employees search, summarize, and ask questions against confined Genco knowledge sources with governed access.",
-      status: "Deployed"
+      status: "Deployed",
+      currentProgress: "HANA has been deployed for testing and is currently awaiting user feedback, while continuous improvements are being implemented concurrently.",
+      wayForward: "Enhance the HANA chatbot with agentic AI to improve information retrieval and its understanding of staff queries."
     },
     {
       title: "PeopleModelling.AI",
@@ -123,7 +125,9 @@ export const projectHistoryData = {
       approach: "React and FastAPI people modelling application with analytics dashboards, data upload modules, succession recommendation, person-to-position matching, scoring rules, audit logs, persistent storage, and Databricks Llama-based inferencing support.",
       stakeholders: "HR",
       value: "Pilot testing supports active position monitoring, candidate availability, talent match scoring, and AI-assisted succession recommendations.",
-      status: "Pilot"
+      status: "Pilot",
+      currentProgress: "Awaiting Talent Card Database completion. The Talent Card portal will launch at the end of October; talent cards will be filled in by targeted employees and fed into the AI application.",
+      wayForward: "To discuss the launch preparations with the PeX Team and provide the necessary assistance."
     },
     {
       title: "Recruitment Filtration.AI",
@@ -149,7 +153,9 @@ export const projectHistoryData = {
       approach: "Contract intelligence hub for document evidence, clause learning, OCR processing, risk comparison, and AI-assisted contract review.",
       stakeholders: "CCM",
       value: "Prototype accelerates contract document discovery, clause review, audit tracking, and AI-assisted policy or risk comparison.",
-      status: "Prototype"
+      status: "Prototype",
+      currentProgress: "Feedback from Pn. Sharzila highlighted the need to improve the chatbot's answer accuracy. However, the current application is already based on an outdated approach, as RAG technology has advanced significantly and newer implementations can provide more accurate and relevant responses.",
+      wayForward: "To propose that the CCM team adopt HANA, as it offers better accuracy while providing the same core functions as CCM.AI."
     },
     {
       title: "Financial Modelling.AI",
@@ -158,7 +164,9 @@ export const projectHistoryData = {
       approach: "AI-assisted financial modelling control center for project finance dashboards, scenario simulation, calculation support, model audit checks, and AI assistant review.",
       stakeholders: "Finance",
       value: "Prototype supports faster project finance review, scenario comparison, investment decision preparation, and model quality checks.",
-      status: "Prototype"
+      status: "Prototype",
+      currentProgress: "Awaiting CFO approval to create Databricks accounts for the Finance team to conduct testing.",
+      wayForward: "Proceed with testing once access is approved and coordinate server deployment based on the results."
     },
     {
       title: "RCA.AI",
@@ -175,7 +183,9 @@ export const projectHistoryData = {
       approach: "AI LLM assistant for Terms and Conditions review, semantic search, comparison, summarization, and revision support across the six TNB Genco T&C books.",
       stakeholders: "HR",
       value: "Prototype helps HR revise T&C content faster, compare clauses across books, and reduce manual review effort with an AI assistant.",
-      status: "Prototype"
+      status: "Prototype",
+      currentProgress: "Product screenshots have been shared with PeX for review; feedback is pending.",
+      wayForward: "Schedule a follow-up meeting with PeX in November to discuss feedback and confirm the next steps."
     },
     {
       title: "Tech.AI",
@@ -184,7 +194,9 @@ export const projectHistoryData = {
       approach: "AI LLM technical manual assistant for AHM document search, summarization, and procedure explanation.",
       stakeholders: "AHM",
       value: "Prototype supports faster technical manual access and engineering knowledge reuse.",
-      status: "Prototype"
+      status: "Prototype",
+      currentProgress: "New feedback from the AHM team regarding indexing time. Improvement done; indexing is now much faster than before.",
+      wayForward: "To close this project. If any further improvement is needed, ask users to migrate to HANA as well."
     },
     {
       title: "Bad Actor.AI",
@@ -193,7 +205,9 @@ export const projectHistoryData = {
       approach: "Equipment intelligence application for bad actor analysis, equipment finder workflows, vendor references, and multi-model AI support for reliability decisions.",
       stakeholders: "Engineering",
       value: "Deployed to support power plant reliability by turning equipment specifications and station failure data into action-ready sourcing and reliability decisions.",
-      status: "Deployed"
+      status: "Deployed",
+      currentProgress: "First data-enhancement workshop in Oct 2026, covering the RCM library (failure modes and components) and the SAP KKS code extract (manual mapping).",
+      wayForward: "Engage power plant staff to fill in the required data for past plant outages, then compare the new AI evaluation results from the complete dataset against the previous results."
     },
     {
       title: "JEDi.AI",
@@ -201,7 +215,9 @@ export const projectHistoryData = {
       approach: "AI-assisted detection concept using chlorophyll-related signals and operational monitoring data.",
       stakeholders: "AOM",
       value: "Prototype supports earlier environmental risk awareness for operations.",
-      status: "Prototype"
+      status: "Prototype",
+      currentProgress: "The ADA team has deployed the app on the production server, but some of its data connections are not working. Work is ongoing locally to integrate the LLM and to fix the PI, Copernicus and other data connections.",
+      wayForward: "Deploy the final version to the production server, ensuring all data connections are working and the AI (LLM) generates a reliable overview."
     },
     {
       title: "WPS.AI",
@@ -210,7 +226,9 @@ export const projectHistoryData = {
       approach: "AI LLM assistant for WPS/PQR drafting, reference extraction, and engineering document preparation.",
       stakeholders: "Remaco RC",
       value: "Prototype supports faster draft preparation and document consistency.",
-      status: "Prototype"
+      status: "Prototype",
+      currentProgress: "Awaiting the required documents from RC to support further development.",
+      wayForward: "Schedule a follow-up meeting with RC in November to review document requirements and agree on the next steps."
     },
     {
       title: "FFU.AI",
@@ -219,7 +237,9 @@ export const projectHistoryData = {
       approach: "AI LLM support for FFU evidence review, evaluation drafting, and engineering assessment assistance.",
       stakeholders: "Engineering",
       value: "Deployed to support more efficient FFU evaluation preparation, evidence review, and engineering assessment assistance.",
-      status: "Deployed"
+      status: "Deployed",
+      currentProgress: "Fixed the issues raised in the last meeting with Pn. Hidayah; AI evaluation has improved from 43% to 63%, compared with human evaluation at 80%.",
+      wayForward: "Monitor the audit logs to track usage rates and confirm whether clients are actively using the app."
     },
     {
       title: "LMS",
@@ -228,7 +248,9 @@ export const projectHistoryData = {
       approach: "Learning management and assessor marking portal for staff assessment, assessor session validation, marking workflows, progress tracking, and reporting.",
       stakeholders: "HR",
       value: "Prototype supports structured staff assessment and training visibility.",
-      status: "Prototype"
+      status: "Prototype",
+      currentProgress: "Deployed the MVP. It can be tested by HR admin, pending their feedback.",
+      wayForward: "Conduct a workshop with the HR team to walk them through the app, including how to upload questions and create exams, and to confirm any final requirements."
     },
     {
       title: "TCP",
@@ -253,7 +275,29 @@ export const projectHistoryData = {
       approach: "AI LLM succession recommendation for role matching, candidate ranking, and readiness reasoning.",
       stakeholders: "HR",
       value: "Prototype supports AI-assisted succession decisions and talent pipeline review.",
-      status: "Prototype"
+      status: "Prototype",
+      currentProgress: "Shared with En. Syed on the current progress of the first draft. A few improvements are still required, such as adding an additional requirements box before the AI runs the analysis, and allowing multiple successors to be identified for specific R0, R1, and R2 categories.",
+      wayForward: "The required improvements have been completed, and an updated version sharing session will be arranged with the PeX Team."
+    },
+    {
+      title: "ClimateChange.AI",
+      problem: "Climate-related operational data is monitored manually, so anomalies and threshold breaches are noticed late and action is delayed.",
+      approach: "AI-assisted climate monitoring dashboard that tracks climate-related indicators, detects anomalies against agreed monitoring rules, and issues automated notifications to the responsible teams.",
+      stakeholders: "AOM",
+      value: "Planned to shorten the time between a climate anomaly appearing in the data and the operations team acting on it.",
+      status: "Planned",
+      currentProgress: "Awaiting the initial in-person meeting with AOM to clarify requirements and define the solution framework.",
+      wayForward: "Obtain monitoring rules from AOM and integrate the dashboard with En. Rizal's WhatsApp solution for automated notifications."
+    },
+    {
+      title: "Risk Screening.AI",
+      problem: "Risk screening and mitigation rely on manual assessment, which slows down reviews and makes risk judgements harder to apply consistently.",
+      approach: "AI-powered risk screening solution that surfaces intelligent risk insights, streamlines assessments, and supports proactive decision-making across the risk management process.",
+      stakeholders: "To be confirmed",
+      value: "Planned to make risk screening faster and more consistent, and to support earlier, better-informed mitigation decisions.",
+      status: "Planned",
+      currentProgress: "Awaiting supporting documents from the client to clarify project requirements, confirm the scope, and establish a clear direction for initial development.",
+      wayForward: "Research and compare available market solutions to identify relevant features, best practices, and suitable approaches to guide the proposed solution's design and development."
     }
   ]
 };
