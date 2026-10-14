@@ -162,7 +162,7 @@ export function TalkingPortrait({
             transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
             // Grow out of the portrait's mouth rather than out of thin air.
             style={{ transformOrigin: bubbleAlign === 'start' ? '2.5rem 100%' : '50% 100%' }}
-            className={`pointer-events-none absolute bottom-full z-40 mb-8 w-[15rem] max-w-[70vw] ${
+            className={`portrait-bubble pointer-events-none absolute bottom-full z-40 mb-8 w-[15rem] max-w-[70vw] ${
               bubbleAlign === 'start' ? 'left-0' : 'left-1/2 -translate-x-1/2'
             }`}
           >

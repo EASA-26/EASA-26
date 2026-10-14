@@ -87,9 +87,11 @@ function CompactOrgCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.5, delay }}
-      className={`glass-card relative w-full p-5 text-left transition-all ${talking ? 'z-30' : 'z-10'} ${locked ? 'border-accent-green/35 shadow-[0_0_28px_rgba(120,214,75,0.16)]' : ''}`}
+      className={`glass-card org-report-card relative flex w-full p-5 text-left transition-all 2xl:p-4 ${talking ? 'z-30' : 'z-10'} ${locked ? 'border-accent-green/35 shadow-[0_0_28px_rgba(120,214,75,0.16)]' : ''}`}
     >
-      <div className="flex items-start gap-4">
+      {/* Five across, the columns are too narrow to put the portrait beside the
+          text, so the card stacks and the text gets the full column. */}
+      <div className="flex w-full items-start gap-4 md:flex-col md:items-center md:gap-3">
         <div className="shrink-0">
           <TalkingPortrait
             name={member.name}
@@ -103,21 +105,23 @@ function CompactOrgCard({
           />
         </div>
 
-        <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <h3 className="text-lg font-bold leading-snug text-white">{member.name}</h3>
+        <div className="min-w-0 flex-1 md:w-full md:flex-none">
+          <div className="flex items-start justify-between gap-3 md:block md:text-center">
+            <div className="min-w-0">
+              <h3 className="text-lg font-bold leading-snug text-white 2xl:text-base">{member.name}</h3>
               <p className="mt-1 text-sm font-medium leading-snug text-electric-cyan">{member.role}</p>
             </div>
+            {/* Stacked, the control moves to the card corner so the name keeps
+                the whole width rather than sharing it. */}
             {locked ? (
-              <span className="rounded-full border border-accent-green/30 bg-accent-green/10 px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-wider text-accent-green">
+              <span className="rounded-full border border-accent-green/30 bg-accent-green/10 px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-wider text-accent-green md:absolute md:right-3 md:top-3">
                 EASA
               </span>
             ) : (
               <button
                 type="button"
                 onClick={onToggle}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-electric-cyan/25 bg-white/5 text-electric-cyan transition hover:bg-electric-cyan/10"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-electric-cyan/25 bg-white/5 text-electric-cyan transition hover:bg-electric-cyan/10 md:absolute md:right-3 md:top-3"
                 aria-expanded={expanded}
                 aria-label={`${expanded ? 'Minimise' : 'Expand'} ${member.name}`}
               >
@@ -193,7 +197,7 @@ export function OrgStructure() {
 
   return (
     <section id="org-structure" className="section-container" ref={sectionRef}>
-      <div className="max-w-6xl mx-auto w-full">
+      <div className="max-w-7xl mx-auto w-full">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -258,10 +262,13 @@ export function OrgStructure() {
             <div className="h-10 w-1 rounded-full bg-electric-cyan shadow-[0_0_18px_rgba(93,244,255,0.65)]" />
           </div>
 
+          {/* On a wide screen the five-across row reaches past the column the
+              rest of the chart sits in. The connector SVG is inside this
+              wrapper, so it widens with the cards and stays aligned. */}
           <div className="relative mb-10">
             {showRizalReports ? (
               <svg
-                className="pointer-events-none absolute left-0 right-0 top-0 hidden h-16 w-full overflow-visible xl:block"
+                className="pointer-events-none absolute left-0 right-0 top-0 hidden h-16 w-full overflow-visible 2xl:block"
                 viewBox="0 0 100 64"
                 preserveAspectRatio="none"
                 aria-hidden="true"
@@ -279,10 +286,10 @@ export function OrgStructure() {
               </svg>
             ) : null}
             {showRizalReports ? (
-              <div className="grid grid-cols-1 gap-5 pt-16 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+              <div className="grid grid-cols-1 gap-5 pt-16 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
                 {visibleRizalReports.map((member, index) => (
                   <div key={member.name} className="relative">
-                    <div className="hidden md:block absolute -top-16 left-1/2 h-16 w-1 -translate-x-1/2 rounded-full bg-electric-cyan shadow-[0_0_18px_rgba(93,244,255,0.65)] xl:hidden" />
+                    <div className="hidden md:block absolute -top-16 left-1/2 h-16 w-1 -translate-x-1/2 rounded-full bg-electric-cyan shadow-[0_0_18px_rgba(93,244,255,0.65)] 2xl:hidden" />
                     <CompactOrgCard
                       member={member}
                       expanded={member.name === lead.name || Boolean(expandedReports[member.name])}
