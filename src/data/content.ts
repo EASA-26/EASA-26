@@ -102,8 +102,8 @@ export const rizalSubordinateData = [
 export const projectHistoryData = {
   metrics: {
     totalProjects: "19",
-    activePilots: "12",
-    deployedSolutions: "4",
+    activePilots: "11",
+    deployedSolutions: "5",
     stakeholdersEngaged: "7"
   },
   projects: [
@@ -193,8 +193,8 @@ export const projectHistoryData = {
       problem: "Technical manuals for AHM are difficult to search quickly during engineering and operational support.",
       approach: "AI LLM technical manual assistant for AHM document search, summarization, and procedure explanation.",
       stakeholders: "AHM",
-      value: "Prototype supports faster technical manual access and engineering knowledge reuse.",
-      status: "Prototype",
+      value: "Deployed to support faster technical manual access and engineering knowledge reuse.",
+      status: "Deployed",
       currentProgress: "New feedback from the AHM team regarding indexing time. Improvement done; indexing is now much faster than before.",
       wayForward: "To close this project. If any further improvement is needed, ask users to migrate to HANA as well."
     },
