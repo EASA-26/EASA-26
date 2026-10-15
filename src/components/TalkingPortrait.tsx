@@ -16,11 +16,6 @@ type TalkingPortraitProps = {
   frameClassName?: string;
   frameStyle?: CSSProperties;
   initialsClassName?: string;
-  /**
-   * Where the bubble hangs. 'center' suits a centred portrait; 'start' keeps the
-   * bubble inside the viewport when the portrait sits near the left edge.
-   */
-  bubbleAlign?: 'center' | 'start';
   onSpeakingChange?: (speaking: boolean) => void;
 };
 
@@ -33,7 +28,6 @@ export function TalkingPortrait({
   frameClassName = '',
   frameStyle,
   initialsClassName = 'text-lg',
-  bubbleAlign = 'center',
   onSpeakingChange,
 }: TalkingPortraitProps) {
   const reduceMotion = useReducedMotion();
@@ -161,12 +155,10 @@ export function TalkingPortrait({
             exit={{ opacity: 0, y: 4, scale: 0.94 }}
             transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
             // Grow out of the portrait's mouth rather than out of thin air.
-            style={{ transformOrigin: bubbleAlign === 'start' ? '2.5rem 100%' : '50% 100%' }}
-            className={`portrait-bubble pointer-events-none absolute bottom-full z-40 mb-8 w-[15rem] max-w-[70vw] ${
-              bubbleAlign === 'start' ? 'left-0' : 'left-1/2 -translate-x-1/2'
-            }`}
+            style={{ transformOrigin: '50% 100%' }}
+            className="pointer-events-none absolute bottom-full left-1/2 z-40 mb-8 w-[15rem] max-w-[70vw] -translate-x-1/2"
           >
-            <p className={`portrait-speech ${bubbleAlign === 'start' ? 'portrait-speech--start' : ''}`}>
+            <p className="portrait-speech">
               {line.slice(0, revealed)}
               {typing && <span className="portrait-speech-caret" aria-hidden="true" />}
             </p>

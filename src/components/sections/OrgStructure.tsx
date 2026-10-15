@@ -87,11 +87,10 @@ function CompactOrgCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.5, delay }}
-      className={`glass-card org-report-card relative flex w-full p-5 text-left transition-all 2xl:p-4 ${talking ? 'z-30' : 'z-10'} ${locked ? 'border-accent-green/35 shadow-[0_0_28px_rgba(120,214,75,0.16)]' : ''}`}
+      className={`glass-card relative flex w-full p-5 text-left transition-all 2xl:p-4 ${talking ? 'z-30' : 'z-10'} ${locked ? 'border-accent-green/35 shadow-[0_0_28px_rgba(120,214,75,0.16)]' : ''}`}
     >
-      {/* Five across, the columns are too narrow to put the portrait beside the
-          text, so the card stacks and the text gets the full column. */}
-      <div className="flex w-full items-start gap-4 md:flex-col md:items-center md:gap-3">
+      {/* The portrait sits above the text so the name gets the full width. */}
+      <div className="flex w-full flex-col items-center gap-3">
         <div className="shrink-0">
           <TalkingPortrait
             name={member.name}
@@ -100,13 +99,12 @@ function CompactOrgCard({
             voice={voice}
             ambientToken={ambientToken}
             onSpeakingChange={setTalking}
-            bubbleAlign="start"
             frameStyle={{ width: '5rem', height: '5rem' }}
           />
         </div>
 
-        <div className="min-w-0 flex-1 md:w-full md:flex-none">
-          <div className="flex items-start justify-between gap-3 md:block md:text-center">
+        <div className="min-w-0 w-full">
+          <div className="text-center">
             <div className="min-w-0">
               <h3 className="text-lg font-bold leading-snug text-white 2xl:text-base">{member.name}</h3>
               <p className="mt-1 text-sm font-medium leading-snug text-electric-cyan">{member.role}</p>
@@ -114,14 +112,14 @@ function CompactOrgCard({
             {/* Stacked, the control moves to the card corner so the name keeps
                 the whole width rather than sharing it. */}
             {locked ? (
-              <span className="rounded-full border border-accent-green/30 bg-accent-green/10 px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-wider text-accent-green md:absolute md:right-3 md:top-3">
+              <span className="rounded-full border border-accent-green/30 bg-accent-green/10 px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-wider text-accent-green absolute right-3 top-3">
                 EASA
               </span>
             ) : (
               <button
                 type="button"
                 onClick={onToggle}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-electric-cyan/25 bg-white/5 text-electric-cyan transition hover:bg-electric-cyan/10 md:absolute md:right-3 md:top-3"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-electric-cyan/25 bg-white/5 text-electric-cyan transition hover:bg-electric-cyan/10 absolute right-3 top-3"
                 aria-expanded={expanded}
                 aria-label={`${expanded ? 'Minimise' : 'Expand'} ${member.name}`}
               >

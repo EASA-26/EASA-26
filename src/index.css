@@ -245,24 +245,6 @@
     border-bottom: 1px solid rgba(93, 244, 255, 0.18);
   }
 
-  /* Left-anchored bubble: point the tail at the middle of the 5rem frame. */
-  .portrait-speech--start::after {
-    left: 2.5rem;
-  }
-
-  /* Once the report card stacks, its portrait is centred, so the bubble centres
-     on the card instead of hanging off the portrait's left edge. */
-  @media (min-width: 768px) {
-    .org-report-card .portrait-bubble {
-      left: 50%;
-      translate: -50% 0;
-    }
-
-    .org-report-card .portrait-speech--start::after {
-      left: 50%;
-    }
-  }
-
   .portrait-speech-caret {
     @apply ml-0.5 inline-block w-[2px] self-stretch bg-electric-cyan align-middle;
     height: 0.85em;
