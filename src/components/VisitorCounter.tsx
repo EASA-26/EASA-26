@@ -2,15 +2,43 @@ import { useEffect, useState } from 'react';
 import { Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-const COUNTER_NAMESPACE = 'easa-26';
-const COUNTER_KEY = 'enterprise-ai-solution-architect-visits';
-const SESSION_KEY = 'easa-visitor-counted';
-const LOCAL_COUNT_KEY = 'easa-local-visitor-count';
+// Shared counter, so a visit from any laptop lands in the same total.
+// The previous service (countapi.xyz) no longer resolves, which is why the
+// counter had been falling back to a per-browser tally.
+const COUNTER_BASE = 'https://abacus.jasoncameron.dev';
+const COUNTER_NAMESPACE = 'easa-26.github.io';
+const COUNTER_KEY = 'easa-site-visits';
+
+// Last good shared total, so a blocked or slow network shows the real figure
+// rather than a number that only means something on this device.
+const LAST_KNOWN_KEY = 'easa-visitor-last-known';
+
+// StrictMode runs effects twice in development, and the component remounts if
+// the section is re-rendered. The hit must happen once per page load.
+let hitSentThisLoad = false;
 
 type CounterState = {
   value: string;
   label: string;
   status: string;
+};
+
+const readLastKnown = () => {
+  try {
+    const stored = Number(localStorage.getItem(LAST_KNOWN_KEY));
+    return Number.isFinite(stored) && stored > 0 ? stored : null;
+  } catch {
+    return null;
+  }
+};
+
+const writeLastKnown = (value: number) => {
+  try {
+    localStorage.setItem(LAST_KNOWN_KEY, String(value));
+  } catch {
+    // Private browsing or blocked storage: the counter still works, it just
+    // has nothing to fall back on next time.
+  }
 };
 
 export function VisitorCounter() {
@@ -23,35 +51,29 @@ export function VisitorCounter() {
   useEffect(() => {
     let isMounted = true;
 
-    const updateFallbackCounter = () => {
-      const alreadyCounted = sessionStorage.getItem(SESSION_KEY) === 'true';
-      const currentCount = Number(localStorage.getItem(LOCAL_COUNT_KEY) ?? '0');
-      const nextCount = alreadyCounted ? currentCount : currentCount + 1;
-
-      if (!alreadyCounted) {
-        localStorage.setItem(LOCAL_COUNT_KEY, String(nextCount));
-        sessionStorage.setItem(SESSION_KEY, 'true');
-      }
-
-      if (isMounted) {
-        setCounter({
-          value: nextCount.toLocaleString(),
-          label: 'Website Opens',
-          status: 'Local device',
-        });
-      }
+    const showFallback = () => {
+      if (!isMounted) return;
+      const lastKnown = readLastKnown();
+      setCounter({
+        value: lastKnown === null ? '--' : lastKnown.toLocaleString(),
+        label: 'Website Opens',
+        status: lastKnown === null ? 'Unavailable' : 'Last known total',
+      });
     };
 
     const updateVisitorCounter = async () => {
-      const alreadyCounted = sessionStorage.getItem(SESSION_KEY) === 'true';
-      const action = alreadyCounted ? 'get' : 'hit';
-      const endpoint = `https://api.countapi.xyz/${action}/${COUNTER_NAMESPACE}/${COUNTER_KEY}`;
+      // Every open counts, but only once per page load.
+      const action = hitSentThisLoad ? 'get' : 'hit';
+      hitSentThisLoad = true;
 
       try {
-        const response = await fetch(endpoint, { cache: 'no-store' });
+        const response = await fetch(
+          `${COUNTER_BASE}/${action}/${COUNTER_NAMESPACE}/${COUNTER_KEY}`,
+          { cache: 'no-store' },
+        );
 
         if (!response.ok) {
-          throw new Error('Counter service unavailable');
+          throw new Error(`Counter service responded ${response.status}`);
         }
 
         const data = await response.json() as { value?: number };
@@ -60,19 +82,17 @@ export function VisitorCounter() {
           throw new Error('Counter response missing value');
         }
 
-        if (!alreadyCounted) {
-          sessionStorage.setItem(SESSION_KEY, 'true');
-        }
+        writeLastKnown(data.value);
 
         if (isMounted) {
           setCounter({
             value: data.value.toLocaleString(),
             label: 'Website Opens',
-            status: alreadyCounted ? 'Current total' : 'Updated',
+            status: 'All devices',
           });
         }
       } catch {
-        updateFallbackCounter();
+        showFallback();
       }
     };
 
