@@ -69,7 +69,10 @@ export function VisitorCounter() {
       try {
         const response = await fetch(
           `${COUNTER_BASE}/${action}/${COUNTER_NAMESPACE}/${COUNTER_KEY}`,
-          { cache: 'no-store' },
+          // keepalive lets the hit finish even if the visitor closes the tab or
+          // clicks straight through to somewhere else. Without it a quick bounce
+          // is dropped mid-flight and that open never gets counted.
+          { cache: 'no-store', keepalive: true },
         );
 
         if (!response.ok) {
