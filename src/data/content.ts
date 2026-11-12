@@ -115,6 +115,7 @@ export const projectHistoryData = {
       stakeholders: "All Genco Employees",
       value: "Deployed as a ChatGPT-like internal knowledge assistant that helps employees search, summarize, and ask questions against confined Genco knowledge sources with governed access.",
       status: "Deployed",
+      url: "https://gencodev.tnb.com.my/hana",
       currentProgress: "HANA has been deployed for testing and is currently awaiting user feedback, while continuous improvements are being implemented concurrently.",
       wayForward: "Enhance the HANA chatbot with agentic AI to improve information retrieval and its understanding of staff queries."
     },
@@ -126,6 +127,7 @@ export const projectHistoryData = {
       stakeholders: "HR",
       value: "Pilot testing supports active position monitoring, candidate availability, talent match scoring, and AI-assisted succession recommendations.",
       status: "Pilot",
+      url: "https://gencodev.tnb.com.my/peoplemodelling",
       currentProgress: "Awaiting Talent Card Database completion. The Talent Card portal will launch at the end of October; talent cards will be filled in by targeted employees and fed into the AI application.",
       wayForward: "To discuss the launch preparations with the PeX Team and provide the necessary assistance."
     },
@@ -165,6 +167,7 @@ export const projectHistoryData = {
       stakeholders: "Finance",
       value: "Prototype supports faster project finance review, scenario comparison, investment decision preparation, and model quality checks.",
       status: "Prototype",
+      url: "https://gencodev.tnb.com.my:8447",
       currentProgress: "Awaiting CFO approval to create Databricks accounts for the Finance team to conduct testing.",
       wayForward: "Proceed with testing once access is approved and coordinate server deployment based on the results."
     },
@@ -184,6 +187,7 @@ export const projectHistoryData = {
       stakeholders: "HR",
       value: "Prototype helps HR revise T&C content faster, compare clauses across books, and reduce manual review effort with an AI assistant.",
       status: "Prototype",
+      url: "http://ghq-dss-apmstg:8032",
       currentProgress: "Product screenshots have been shared with PeX for review; feedback is pending.",
       wayForward: "Schedule a follow-up meeting with PeX in November to discuss feedback and confirm the next steps."
     },
@@ -195,6 +199,7 @@ export const projectHistoryData = {
       stakeholders: "AHM",
       value: "Deployed to support faster technical manual access and engineering knowledge reuse.",
       status: "Deployed",
+      url: "http://ghq-dss-apmstg:8031/",
       currentProgress: "New feedback from the AHM team regarding indexing time. Improvement done; indexing is now much faster than before.",
       wayForward: "To close this project. If any further improvement is needed, ask users to migrate to HANA as well."
     },
@@ -276,6 +281,7 @@ export const projectHistoryData = {
       stakeholders: "HR",
       value: "Prototype supports AI-assisted succession decisions and talent pipeline review.",
       status: "Prototype",
+      url: "https://gencodev.tnb.com.my:8446",
       currentProgress: "Shared with En. Syed on the current progress of the first draft. A few improvements are still required, such as adding an additional requirements box before the AI runs the analysis, and allowing multiple successors to be identified for specific R0, R1, and R2 categories.",
       wayForward: "The required improvements have been completed, and an updated version sharing session will be arranged with the PeX Team."
     },

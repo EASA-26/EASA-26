@@ -1,5 +1,6 @@
 import { projectHistoryData } from '../../data/content';
 import { motion } from 'framer-motion';
+import { ExternalLink } from 'lucide-react';
 import { cn } from '../../utils/cn';
 
 export function ProjectHistory() {
@@ -101,6 +102,28 @@ export function ProjectHistory() {
               <div className="mt-auto pt-4 border-t border-white/10">
                 <div className="text-xs text-slate-500 uppercase tracking-wider mb-1">Value Delivered / Expected</div>
                 <p className="text-accent-green font-medium text-sm">{project.value}</p>
+
+                {'url' in project && project.url && (
+                  <div className="mt-4">
+                    <a
+                      href={project.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      // The card title sits right above, so the button stays short
+                      // and the full name goes to screen readers instead.
+                      aria-label={`Open ${project.title}`}
+                      className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg border border-electric-cyan/35 bg-electric-cyan/10 px-3.5 py-2 text-xs font-bold uppercase tracking-wider text-electric-cyan transition hover:bg-electric-cyan/20 hover:text-white focus:outline-none focus:ring-2 focus:ring-electric-cyan/50"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                      <span>Open application</span>
+                    </a>
+                    {/* These are internal hosts, so say so rather than letting the
+                        link look broken to anyone off the network. */}
+                    <p className="mt-2 text-[0.65rem] uppercase tracking-wider text-slate-500">
+                      Opens on the TNB network
+                    </p>
+                  </div>
+                )}
               </div>
             </motion.div>
           ))}
